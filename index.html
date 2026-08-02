@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>阵列场站｜天线学习情报</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="masthead">
+    <a class="brand" href="#" aria-label="返回今日简报">
+      <span class="brand-mark" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </span>
+      <span>
+        <strong>阵列场站</strong>
+        <small>ARRAY FIELD STATION</small>
+      </span>
+    </a>
+    <div class="status">
+      <span class="status-dot"></span>
+      <span id="updateStatus">内容系统就绪</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">OAM · PHASED ARRAY · ANTI-JAMMING</p>
+        <h1>把复杂电磁场，<br><em>读成清晰的方向。</em></h1>
+        <p class="intro">面向天线研究生的每日学习与行业情报站。理论为主线，需求为坐标，CST与MATLAB是验证工具。</p>
+      </div>
+      <div class="radar-wrap" aria-hidden="true">
+        <div class="radar">
+          <span class="sweep"></span>
+          <span class="blip b1"></span>
+          <span class="blip b2"></span>
+          <span class="blip b3"></span>
+          <span class="axis x"></span>
+          <span class="axis y"></span>
+        </div>
+        <div class="radar-caption"><span>FIELD MAP</span><b id="issueNumber">00</b></div>
+      </div>
+    </section>
+
+    <section class="command-bar" aria-label="简报控制栏">
+      <div class="date-block">
+        <span>当前简报</span>
+        <strong id="briefDate">加载中</strong>
+      </div>
+      <div class="selector-wrap">
+        <label for="issueSelect">历史期刊</label>
+        <select id="issueSelect"></select>
+      </div>
+      <button id="printButton" type="button" class="ghost-button">打印 / 保存PDF</button>
+    </section>
+
+    <section id="briefHeader" class="brief-header"></section>
+
+    <nav id="moduleNav" class="module-nav" aria-label="内容模块"></nav>
+    <section id="contentGrid" class="content-grid" aria-live="polite"></section>
+  </main>
+
+  <footer>
+    <span>资料仅用于个人学习与公开信息研究</span>
+    <span id="footerUpdate"></span>
+  </footer>
+
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
