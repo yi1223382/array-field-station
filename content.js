@@ -1,5 +1,171 @@
 window.DAILY_BRIEFS = [
   {
+    issue: 5,
+    date: "2026-08-03",
+    dateLabel: "2026年8月3日 · ISSUE 05",
+    updatedAt: "2026-08-03 15:13",
+    title: "OAM、MIMO与波束赋形：同一信道的三种语言",
+    summary: "从信道矩阵和基变换出发，说明OAM模态、传统波束赋形与MIMO奇异模之间的关系：DFT/OAM基在旋转对称圆阵链路中可成为本征基，但基变换不创造额外空间自由度；抗干扰收益必须由实际信道、约束和公平基线共同验证。近7日未发现足够可靠的新动态。",
+    readingMinutes: 24,
+    modules: [
+      {
+        label: "今日结论",
+        title: "OAM是有物理意义的空间基，但不是脱离MIMO的新容量维度",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "list", items: [
+            "窄带阵列链路都可写成y=Hx+n。OAM收发通常是在阵元端口前后乘DFT型矩阵；若变换是酉的，它只改变坐标表示，不增加H的秩、奇异值或总容量。",
+            "同轴、等半径或规则圆阵、自由空间且阵元响应近似旋转对称时，H接近循环矩阵，DFT/OAM模态可近似对角化信道；偏轴、互耦、遮挡和多径会破坏这一条件。",
+            "波束赋形回答“怎样加权形成或抑制某个空间响应”，MIMO回答“完整多端口信道有多少可用子通道”，OAM则提供一组带角向相位结构的固定基；三者不是互斥技术。",
+            "对OAM抗干扰课题，真正可检验的问题是：在相同孔径、射频通道、总功率、CSI误差和训练开销下，模态约束能否让输出SINR、BER或鲁棒性优于MVDR/LCMV、SVD等基线。",
+            "截至2026年8月3日15:13（北京时间），近7日未发现足够可靠、直接相关的新动态；本期采用权威常青资料与已公开标准进程，不制造热点。"
+          ] }
+        ],
+        tags: ["OAM vs MIMO", "基变换", "空间自由度", "公平基线"]
+      },
+      {
+        label: "核心理论",
+        title: "从端口信道H看DFT基、奇异模与容量",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "text", text: "设发射阵列有Nt个端口、接收阵列有Nr个端口，x、y分别是端口复包络，H∈ℂ^{Nr×Nt}包含传播、阵元方向图、极化、互耦和参考面定义。窄带模型中，所有空间处理都应回到这个对象。" },
+          { type: "formula", text: "y=Hx+n；　H=UΣVᴴ；　r=rank(H)≤min(Nt,Nr)" },
+          { type: "heading", text: "三种语言分别在做什么" },
+          { type: "list", items: [
+            "波束赋形：选择发射权f和接收权w，得到标量通道wᴴHf；可用于定向增益、零陷或多约束优化。",
+            "MIMO奇异模：H的SVD给出成对的V和U，使UᴴHV=Σ；在已知H且约束匹配时，这是一组互不耦合的信道本征方向。",
+            "OAM/角向DFT模态：对N阵元UCA使用F[n,ℓ]=N⁻¹ᐟ²exp(jℓφn)。它由几何对称性预先规定，具有清晰的角向阶次，但一般不等于任意H的奇异向量。"
+          ] },
+          { type: "heading", text: "为什么同轴圆阵会把三种语言对齐" },
+          { type: "text", text: "若发射与接收UCA同轴且信道只依赖阵元角度差，即Hmn=h[(m−n) mod N]，则H是循环矩阵。循环矩阵的本征向量正是DFT列，因此OAM模态域信道FᴴHF为对角阵。此时“发送拓扑荷ℓ”与“激励一个MIMO本征模”可以是同一件事。" },
+          { type: "formula", text: "Hmn=h[(m−n) mod N] ⇒ FᴴHF=Λ；　λℓ=Σq h[q]e^{−j2πℓq/N}" },
+          { type: "heading", text: "基变换保留什么，改变什么" },
+          { type: "text", text: "对任意酉矩阵Fr、Ft，Hmode=FrᴴHFt与H具有相同奇异值、Frobenius范数和秩。它能把结构显露出来，却不能凭空提高自由度。若固定OAM基不再对角化H，非对角项表示基失配下的模态串扰；SVD可重新对角化已知H，但需要CSI并可能带来训练、反馈和硬件代价。" },
+          { type: "formula", text: "Hmode=FrᴴHFt；　σi(Hmode)=σi(H)；　C=Σi log₂(1+piσi²/N₀)" },
+          { type: "heading", text: "自由度、容量与模态数不能混用" },
+          { type: "text", text: "可生成N个离散DFT权值，不表示N个模态都有可用链路增益。有效自由度取决于奇异值相对噪声和功率预算的大小；高阶OAM模态常因有限口径、距离和采样而具有很小的σi。报告容量时还必须说明总发射功率、噪声带宽、功率分配和CSI假设。" }
+        ],
+        tags: ["H=UΣVᴴ", "循环矩阵", "DFT本征基", "有效DoF"]
+      },
+      {
+        label: "课题连接",
+        title: "把“模态抗干扰”改写成受约束的接收优化",
+        tone: "accent",
+        blocks: [
+          { type: "heading", text: "合理结论" },
+          { type: "list", items: [
+            "若期望信号和干扰在实测通道中投影到不同角向子空间，固定模态滤波可以低复杂度分离二者；收益来自空间可分性，而非拓扑荷标签本身。",
+            "OAM基可作为结构化先验：用少数模态描述期望信号，能减少待估参数或给LCMV增加保持约束；但先验错误会造成期望信号自损失。",
+            "在对称性被破坏后，联合波束—模态接收可写成阵元域优化，再用模态域解释权值；无需把两者包装成互斥方案。"
+          ] },
+          { type: "formula", text: "SINRout=Pₛ|wᴴhₛ|²/[wᴴ(Rⱼ+Rₙ)w]；　wLCMV=R⁻¹C(CᴴR⁻¹C)⁻¹f" },
+          { type: "heading", text: "适用条件" },
+          { type: "text", text: "固定OAM滤波需要稳定的阵列坐标、幅相校准和足够角向采样；自适应接收还需要训练数据足以估计协方差或CSI。宽带时H、模态纯度和最优权值随频率变化，应逐子载波或用宽带约束评估，不能只看中心频点。" },
+          { type: "heading", text: "仍有争议或待验证的主张" },
+          { type: "text", text: "“OAM在同孔径下提供额外容量”以及“OAM天然免疫同频干扰”都不是一般性结论。建议将固定DFT/OAM、SVD、MVDR/LCMV和相同通道数的常规波束赋形置于同一Monte Carlo框架，固定孔径、通道数、总功率、J/S、干扰角分布、CSI误差和计算预算，再比较输出SINR、BER/BLER及5%分位性能。" }
+        ],
+        tags: ["结构先验", "LCMV", "期望信号保护", "鲁棒性分位数"]
+      },
+      {
+        label: "行业需求",
+        title: "标准进程强调可评估性；注意3GPP中的OAM缩写碰撞",
+        layout: "wide",
+        tone: "industry",
+        priority: "证据分级",
+        blocks: [
+          { type: "heading", text: "A｜近7日动态核验结果" },
+          { type: "text", text: "截至2026年8月3日15:13（北京时间），未发现近7日内同时满足“公开原始来源、日期可核对、与阵列/OAM/防御性抗干扰直接相关”的足够新动态。ITU-R提交与评估页面写明状态截至2026年7月，但未给出可核对到日的更新日期，因此只作为标准进程状态，不冒充近7日新闻。" },
+          { type: "heading", text: "B｜IMT-2030进入候选技术提交与独立评估组织准备阶段（强证据：ITU-R官方页面，状态截至2026-07）" },
+          { type: "text", text: "ITU-R官方页面显示，IMT-2030地面无线接口建议书的制定流程已经启动；页面列出的独立评估组织申请仍在审查，列名不代表获批。ITU-R另一官方页面说明2026年6月完成的评估指南仍是提交SG 5、计划于2026年12月审议的草案，并包含近场、空间非平稳等扩展信道模型。对阵列研究的强信号是：方案要能在规定环境、模型和评价方法下复核，而不是只展示最佳场图。" },
+          { type: "list", items: [
+            "阵列/基站：工作带宽、扫描范围、扫描损耗、EIRP/EIS、旁瓣、交叉极化、校准误差、每通道与整机功耗。",
+            "结构化场：物理孔径、距离/波长、有效DoF、奇异值谱、模态串扰矩阵、偏轴/倾斜/频偏容差，以及同孔径MIMO基线。",
+            "高可靠抗干扰：干扰模型与J/S、输出SINR、BER/BLER、零陷深度和宽度、期望信号损失、收敛时间、CSI误差及5%分位性能。",
+            "证据边界：评估指南目前是草案；近场和空间非平稳被纳入模型，不等于ITU-R认可OAM为独立的新空分维度。"
+          ] },
+          { type: "heading", text: "C｜3GPP的NR_MIMO-OAM不是轨道角动量（强证据：3GPP官方工作项，2026-06-03启动）" },
+          { type: "text", text: "3GPP门户存在Rel-20工作项“NR_MIMO-OAM”，但其正式名称是Management enhancements related to NR MIMO，即NR MIMO管理增强；负责组为SA5，父项是NR MIMO Phase 6。这里的OAM是该工作项内部缩写，不能据此声称“3GPP已采纳orbital angular momentum”。这是检索和行业汇报中必须主动消歧的例子。" },
+          { type: "list", items: [
+            "可确认：工作项状态为PCG approved，开始日期2026-06-03，计划结束2027-03-03。",
+            "不可确认：仅凭工作项元数据，不能推断具体射频、天线或OAM涡旋波条款，也不能宣称产品已部署。",
+            "需求翻译：若研究声称可进入系统标准，应明确它作用于物理层信道、天线实现、波束管理还是网管接口，并给出对应的规范对象和可测试参数。"
+          ] },
+          { type: "sources", items: [
+            { label: "ITU-R：IMT-2030提交与评估流程，独立评估组织状态截至2026年7月", url: "https://www.itu.int/en/ITU-R/study-groups/rsg5/rwp5d/imt-2030/Pages/submission-eval.aspx" },
+            { label: "ITU-R：IMT-2030评估指南草案状态与扩展信道模型（2026年6月）", url: "https://www.itu.int/en/ITU-R/study-groups/rsg5/rwp5d/imt-2030/pages/default.aspx" },
+            { label: "3GPP：Rel-20工作项NR_MIMO-OAM的正式名称与状态", url: "https://portal.3gpp.org/desktopmodules/WorkItem/WorkItemDetails.aspx?workitemId=1120105" },
+            { label: "3GPP：Release 20官方概览与冻结时间线", url: "https://www.3gpp.org/specifications-technologies/releases/release-20" }
+          ] }
+        ],
+        tags: ["IMT-2030评估", "NR MIMO", "缩写消歧", "指标化"]
+      },
+      {
+        label: "CST × MATLAB",
+        title: "最小任务：比较固定OAM基与SVD基",
+        blocks: [
+          { type: "text", text: "目标是在60分钟内用同一信道矩阵验证“基变换不改变奇异值，但固定OAM基会因失配产生串扰”。沿用8阵元发射UCA与8阵元接收UCA；优先使用CST多端口S参数或端口到接收探针的复响应，暂时没有数据时可用自由空间点源信道作基线。" },
+          { type: "list", items: [
+            "CST：在单一工作频点逐个激励8个发射端口，其他端口按统一阻抗终端；记录8个接收端口复响应，组装H，并保存端口顺序、参考阻抗、频率和坐标系。",
+            "MATLAB：构造8×8酉DFT矩阵F，计算Hmode=FᴴHF、[U,S,V]=svd(H)；核对svd(Hmode)与diag(S)在数值精度内一致。",
+            "对齐基线：计算非对角能量κoff=‖Hmode−diag(diag(Hmode))‖F²/‖Hmode‖F²，并记录有效奇异值数Neff=(Σσi²)²/Σσi⁴。",
+            "失配测试：把接收UCA横移0.05λ和0.20λ后重复求解或重算传播距离；比较κoff、固定DFT零迫解的噪声增强以及SVD基的奇异值。",
+            "抗干扰扩展：加入一个公开、防御性仿真的空间干扰协方差Rj，只比较固定模态选择与MVDR接收的SINRout；不要设计或描述对外发射干扰。"
+          ] },
+          { type: "formula", text: "κoff=‖Hmode−diag(diag(Hmode))‖F²/‖Hmode‖F²；　Neff=(Σiσi²)²/Σiσi⁴" },
+          { type: "text", text: "验收：酉变换前后的奇异值相对误差应接近机器精度；偏移后κoff通常上升，但H的奇异值如何变化要由几何和归一化决定，不能预设单调。最终画三图：|Hmode|热图、归一化奇异值谱、κoff随d/λ曲线。" }
+        ],
+        tags: ["多端口H", "FᴴHF", "SVD", "κoff"]
+      },
+      {
+        label: "论文精读",
+        title: "TWC 2026：圆阵LOS信道何时由OAM/DFT模态对角化",
+        tone: "accent",
+        blocks: [
+          { type: "text", text: "本期精读Ding等人的《Spatial Multiplexing Over LOS Channels With Circular Arrays: Analysis and Design》，发表于IEEE Transactions on Wireless Communications第25卷、4936–4952页，DOI 10.1109/TWC.2025.3615506；Chalmers出版记录标为2026年期刊论文并提供作者全文。它比笼统争论“OAM还是MIMO”更进一步：直接把连续圆孔径本征模、离散圆阵采样和MIMO奇异值连接起来。" },
+          { type: "heading", text: "研究问题与方法" },
+          { type: "text", text: "论文研究同轴LOS圆形发射/接收结构的空间复用。作者先把连续圆天线间信道写成有界线性正规算子，以部署参数β（与发射半径、接收半径、波长和距离的组合有关）描述几何；再通过空间采样推到离散UCA及多个子UCA配置，推导奇异值和DFT收发结构。" },
+          { type: "formula", text: "β∝RtRr/(λD)；　连续圆信道的角向本征函数为e^{jℓφ}，本征值由第一类Bessel函数决定" },
+          { type: "heading", text: "主要结果" },
+          { type: "list", items: [
+            "OAM角向谐波是所研究连续圆LOS算子的本征模；离散UCA的DFT模态是连续模态的空间采样，对应奇异值带有采样/混叠效应。",
+            "有效空间自由度通常随部署参数增加，但在固定角偏置下不保证单调；固定阵元数时，容量也不一定随部署参数单调增加。",
+            "当阵元数相对部署参数不足时，接收角偏置会显著影响性能；阵元数增大后，离散阵列奇异值趋近连续圆结果，角偏置影响减弱。",
+            "论文研究的非均匀多子UCA配置，在角偏置优化后相对均匀配置只有很小或没有增益。"
+          ] },
+          { type: "heading", text: "局限与证据边界" },
+          { type: "text", text: "模型聚焦LOS、圆形几何及论文给定的电磁近似条件；结论不能直接覆盖任意偏轴、多径、强互耦、宽带色散或有限精度射频链。它证明的是特定算子中OAM基与MIMO本征模的关系，不是所有OAM实现都自动达到容量，也不是结构化场在感知、低复杂度处理或鲁棒先验上没有价值。" },
+          { type: "heading", text: "可复现价值" },
+          { type: "text", text: "论文给出的β—Bessel本征值—离散奇异值链条可作为今天CST/MATLAB任务的理想上界。先复现同轴UCA的FᴴHF近对角化，再加入真实嵌入方向图和互耦；“理想解析值→点源H→CST多端口H”的三级差异，正好量化工程实现把多少理论自由度变成了不可用的小奇异值。" },
+          { type: "sources", items: [
+            { label: "Chalmers出版记录：Ding et al., IEEE TWC 25, 4936–4952（2026）", url: "https://research.chalmers.se/en/publication/550276" },
+            { label: "Chalmers作者全文PDF：Spatial Multiplexing Over LOS Channels With Circular Arrays", url: "https://research.chalmers.se/publication/550276/file/550276_Fulltext.pdf" },
+            { label: "IEEE DOI：10.1109/TWC.2025.3615506", url: "https://doi.org/10.1109/TWC.2025.3615506" }
+          ] }
+        ],
+        tags: ["LOS MIMO", "连续圆孔径", "Bessel本征值", "空间采样"]
+      },
+      {
+        label: "术语与思考题",
+        title: "区分模式标签、信道本征模和有效自由度",
+        layout: "wide",
+        blocks: [
+          { type: "list", items: [
+            "Unitary transform（酉变换）：满足QᴴQ=I的复线性变换；保持向量能量和矩阵奇异值，常用于阵元域与模态域切换。",
+            "Singular mode（奇异模）：由H的左右奇异向量定义的成对收发空间方向，其增益为对应奇异值σi。",
+            "Circulant matrix（循环矩阵）：每一行是上一行的循环移位；DFT向量是其固定本征基，是同轴规则UCA中OAM模态成立的数学核心。",
+            "Effective degrees of freedom（有效自由度）：在给定SNR、功率和阈值下真正可用的空间子通道数；不等于可编号的模态数或阵元数。",
+            "Noise enhancement（噪声增强）：ZF等逆信道处理在小奇异值方向放大噪声的现象，常使形式上可分的高阶模态在工程上不可用。"
+          ] },
+          { type: "heading", text: "思考题" },
+          { type: "text", text: "一个8×8同轴UCA链路的Hmode=FᴴHF近似对角。现在加入一个横向偏移，使κoff从−25 dB升到−10 dB，但H的前四个奇异值几乎不变。请解释为什么“固定OAM解复用明显恶化”与“最优MIMO容量近似不变”可以同时成立；再设计一组包含CSI训练开销和射频移相精度的实验，判断SVD接收恢复容量所付出的工程代价。" }
+        ],
+        tags: ["Unitary transform", "Singular mode", "Circulant matrix", "研究生思考题"]
+      }
+    ]
+  },
+  {
     issue: 4,
     date: "2026-08-02",
     dateLabel: "2026年8月2日 · ISSUE 04",
