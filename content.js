@@ -1,5 +1,176 @@
 window.DAILY_BRIEFS = [
   {
+    issue: 7,
+    date: "2026-08-05",
+    dateLabel: "2026年8月5日 · ISSUE 07",
+    updatedAt: "2026-08-05 11:49",
+    title: "干扰与信道模型：先说明信号怎样进入阵列",
+    summary: "从窄带复基带接收模型出发，区分期望信号、干扰、噪声和模型失配，解释干扰协方差如何决定阵列或Orbital Angular Momentum（OAM，轨道角动量）模态接收器能否形成有效零陷。结合近7日公开的FR3超大规模MIMO信道建模与相控阵功放资料，把抽象的“抗干扰”翻译为可复现实验条件和可测指标。",
+    readingMinutes: 24,
+    modules: [
+      {
+        label: "今日结论",
+        title: "抗干扰结论必须和信道假设一起出现",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "list", items: [
+            "窄带阵列模型y=hₛs+Hⱼj+n把接收快照拆成期望信号、干扰和噪声。直观上，阵列看到的不是一串“干扰强度”，而是每个端口上彼此相关的复数幅相样本；能否抑制取决于这些空间响应是否可分。",
+            "Jam-to-Signal ratio（J/S，干信比）是接收机输入端干扰功率与期望信号功率之比，通常用dB表示。J/S只说明输入有多难，不能代替输出Signal-to-Interference-plus-Noise Ratio（SINR，信干噪比）、Bit Error Rate（BER，误码率）或期望信号损失。",
+            "干扰协方差矩阵记录各阵元干扰的功率与相关性。若干扰与期望信号的阵列响应几乎平行，即使干扰秩很低，也很难在保持期望信号的同时形成深零陷；这属于几何可分性限制，不是换成OAM标签即可消失。",
+            "把阵元域乘以Discrete Fourier Transform（DFT，离散傅里叶变换）矩阵得到OAM模态域，只是坐标变换。若接收孔径、对准或传播环境破坏旋转对称性，期望信号和干扰都会跨模态泄漏，固定模态选择器可能同时丢掉期望能量。",
+            "近7日有两条可核对的相关预印本：2026年8月4日的6–24 GHz超大规模阵列信道与外场试验综述，以及2026年7月31日的相控阵功放有源驻波比综述。两者均为原始预印本，能提示工程变量，但不等于已形成标准或普适产品结论。"
+          ] }
+        ],
+        tags: ["接收模型", "J/S", "干扰协方差", "OAM模态域"]
+      },
+      {
+        label: "核心理论",
+        title: "从一帧阵列数据到可检验的输出SINR",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "text", text: "直观解释：把N个接收端口想成N只同时录音的麦克风。期望信号、外部干扰和接收机噪声都在每个端口留下复数幅相。数字权值w再把N路样本相加；若干扰在空间上与期望信号不同，合成时可以让期望信号同相叠加、干扰相消。" },
+          { type: "heading", text: "条件与变量：窄带复基带模型" },
+          { type: "text", text: "设N＝接收端口数；y∈ℂᴺ＝一个窄带复基带快照，单位可按V或归一化幅度约定；s∈ℂ＝期望符号；hₛ∈ℂᴺ＝期望信号的端口域信道/导向向量；K＝干扰源数；j∈ℂᴷ＝干扰符号向量；Hⱼ∈ℂᴺˣᴷ＝干扰信道矩阵；n∈ℂᴺ＝接收机噪声。窄带意味着阵列孔径上的传播时延差相对信号带宽足够小，可用相位差近似；宽带时应按频点或时延抽头建模。" },
+          { type: "formula", text: "y = hₛs + Hⱼj + n；　z = wᴴy" },
+          { type: "text", text: "z∈ℂ＝合成后的标量输出；w∈ℂᴺ＝接收权值；上标H表示共轭转置。若是均匀圆阵，hₛ不应只写成理想平面波相位；昨天得到的嵌入阵元方向图、互耦、极化、有限距离和接收姿态都应进入hₛ或完整传播矩阵。" },
+          { type: "heading", text: "用协方差描述干扰的空间形状" },
+          { type: "text", text: "Rᵢ＝干扰加噪声协方差矩阵，单位取决于数据标定，常为W或V²；E{·}表示统计期望。矩阵对角元是各端口功率，非对角元表示端口间相关性。直观上，Rᵢ的主特征向量指出干扰能量最常出现的空间方向，而特征值说明各方向有多强。" },
+          { type: "formula", text: "Rᵢ = E{(Hⱼj+n)(Hⱼj+n)ᴴ} = HⱼRⱼHⱼᴴ + Rₙ" },
+          { type: "text", text: "Rⱼ＝干扰源协方差矩阵；Rₙ＝噪声协方差矩阵。若噪声在各端口独立且等功率，则Rₙ=σₙ²I，其中σₙ²＝单端口噪声功率，单位W；I＝单位矩阵。有限快照下只能用样本协方差R̂ᵢ估计Rᵢ，快照过少、期望信号混入训练数据或环境变化都会造成估计偏差。" },
+          { type: "heading", text: "输出指标与几何可分性" },
+          { type: "text", text: "设Pₛ＝期望信号平均功率，单位W。输出SINR比较合成后的期望功率与干扰加噪声功率；数值越大通常越利于降低BER，但两者关系还取决于调制、编码和检测器。" },
+          { type: "formula", text: "SINRout = Pₛ|wᴴhₛ|² / (wᴴRᵢw)" },
+          { type: "text", text: "Minimum Variance Distortionless Response（MVDR，最小方差无失真响应）在约束wᴴhₛ=1下最小化输出干扰加噪声功率。直观上，它把期望方向钉住，再在剩余空间自由度中寻找最安静的组合。" },
+          { type: "formula", text: "wMVDR = Rᵢ⁻¹hₛ / (hₛᴴRᵢ⁻¹hₛ)" },
+          { type: "text", text: "该闭式解要求Rᵢ可逆且hₛ足够准确。若干扰导向向量hⱼ与hₛ的归一化相关系数ρ=|hₛᴴhⱼ|/(‖hₛ‖₂‖hⱼ‖₂)接近1，则深零陷会同时伤害期望信号。ρ＝0表示两者在当前端口采样下正交；ρ＝1表示完全共线。" },
+          { type: "formula", text: "ρ = |hₛᴴhⱼ|/(‖hₛ‖₂‖hⱼ‖₂)，　0≤ρ≤1" },
+          { type: "sources", items: [
+            { label: "IEEE DOI：Capon, High-Resolution Frequency-Wavenumber Spectrum Analysis（1969）", url: "https://doi.org/10.1109/PROC.1969.7278" },
+            { label: "IEEE DOI：Reed, Mallett & Brennan, Rapid Convergence Rate in Adaptive Arrays（1974）", url: "https://doi.org/10.1109/TAES.1974.307893" }
+          ] }
+        ],
+        tags: ["y=hₛs+Hⱼj+n", "Rᵢ", "MVDR", "几何可分性"]
+      },
+      {
+        label: "课题连接",
+        title: "把OAM抗干扰写成端口域与模态域的同一个实验",
+        tone: "accent",
+        blocks: [
+          { type: "heading", text: "合理结论" },
+          { type: "list", items: [
+            "令F∈ℂᴺˣᴺ为归一化DFT矩阵，则模态快照yₘ=Fᴴy、模态信道hₛ,ₘ=Fᴴhₛ、模态协方差Rᵢ,ₘ=FᴴRᵢF。若F是酉矩阵，变换前后总能量和最优线性接收器可达到的输出SINR不凭空改变；模态域的价值是暴露角向结构并便于施加模态约束。",
+            "当同轴圆阵、传播和加载近似旋转对称时，OAM模态可能让期望信号与某些干扰呈现较低ρ，固定模态滤波就可能用很低复杂度获得抑制。应把这写成特定几何下的可检验假设，而非“OAM天然抗干扰”。",
+            "偏轴、多径、互耦不对称或孔径截断会让FᴴH F出现非对角项。此时模态泄漏既可能来自期望信道，也可能来自干扰信道；需要分别画期望模态功率谱和干扰模态功率谱，不能只给合成后的单个纯度百分比。"
+          ] },
+          { type: "formula", text: "yₘ=Fᴴy；　Rᵢ,ₘ=FᴴRᵢF；　w=Fwₘ" },
+          { type: "heading", text: "适用条件" },
+          { type: "text", text: "公平对照应固定物理孔径、阵元/射频通道数、总接收功率、采样率、快照数、校准误差和可用的Channel State Information（CSI，信道状态信息）。CSI是接收机掌握的信道幅相信息；它像一张不断更新的空间地图，假设“完美CSI”通常会高估实际零陷深度。" },
+          { type: "heading", text: "仍有争议或待验证" },
+          { type: "text", text: "尚不能从“模态正交”直接推出复杂干扰下的BER优势。需要至少扫描J/S、干扰到达角、期望/干扰相关系数ρ、接收横向偏移、频率、快照数和导向矢量误差，并比较固定OAM选择、阵元域MVDR、模态域MVDR以及常规波束赋形。若酉变换且约束信息相同，阵元域与完整模态域MVDR应数值等价；差异通常来自模态截断、正则化或模型先验。" },
+          { type: "text", text: "本期只讨论接收端防御性建模与鲁棒性评价，不提供对外发射干扰的设备、功率或部署指导。" }
+        ],
+        tags: ["模态协方差", "CSI", "公平对照", "接收端防御"]
+      },
+      {
+        label: "行业需求",
+        title: "近7日信号：大孔径系统正在逼迫信道与硬件联合建模",
+        layout: "wide",
+        tone: "industry",
+        priority: "证据分级",
+        blocks: [
+          { type: "heading", text: "A｜FR3超大规模MIMO信道与外场试验（中等证据：原始预印本，2026-08-04）" },
+          { type: "text", text: "Miao等于2026年8月4日提交的预印本把Frequency Range 3（FR3，6–24 GHz新中频段）与Extremely Large-Scale Multiple-Input Multiple-Output（XL-MIMO，超大规模多输入多输出）结合起来，综述近场、空间非平稳信道、估计和波束形成，并介绍超过1000阵元的宽带信道探测设备、1536/768阵元算法评估和Upper 6 GHz（U6GHz，6 GHz上部频段）外场试验。摘要明确指出目标Signal-to-Noise Ratio（SNR，信噪比）是其U6GHz系统性能的关键因素。它是预印本，详细场景、基线和外推边界仍需阅读全文核验。" },
+          { type: "list", items: [
+            "需求翻译：信道模型至少报告频段、带宽、阵列孔径、近远场边界、可见区域、空间相关矩阵、时延/角度扩展、测量动态范围、校准方法和SNR。",
+            "与课题的关系：大孔径OAM接收不能默认所有阵元看到相同统计信道；应检查模态协方差是否随阵元位置、频率和距离变化。",
+            "证据边界：作者报告包含外场试验，但当前公开版本尚未经过同行评审；不能把特定U6GHz原型结果直接移植到其他频段或OAM系统。"
+          ] },
+          { type: "heading", text: "B｜相控阵功放要承受随扫描变化的负载（中等证据：综述预印本，2026-07-31）" },
+          { type: "text", text: "Chu等于2026年7月31日提交的20页综述说明：密集相控阵中，互耦、封装和互连使每个Power Amplifier（PA，功率放大器）看到的有源负载随频率、扫描角和阵元位置变化。Voltage Standing Wave Ratio（VSWR，电压驻波比）变化会影响输出功率、增益、Power-Added Efficiency（PAE，功率附加效率）、幅相失真与可靠性裕量，进而影响Equivalent Isotropically Radiated Power（EIRP，等效全向辐射功率）、Error Vector Magnitude（EVM，误差矢量幅度）、热密度和校准。" },
+          { type: "list", items: [
+            "相控阵/基站指标：工作带宽、扫描范围、扫描态有源VSWR、实现增益、旁瓣、EIRP一致性、EVM、每通道PAE、结温和校准开销。",
+            "OAM/结构化场指标：每个拓扑荷的有源VSWR、辐射效率、模态串扰矩阵、模态纯度、有效孔径占比和频率稳定性。",
+            "防御性抗干扰指标：输入J/S、输出SINR、BER、零陷深度、期望信号增益损失、快照数、收敛时间、导向误差容限、总功耗和成本。"
+          ] },
+          { type: "heading", text: "C｜权威背景：IMT-2030评估框架仍在形成" },
+          { type: "text", text: "International Telecommunication Union Radiocommunication Sector（ITU-R，国际电信联盟无线电通信部门）官方页面显示，Working Party 5D（WP 5D，第5D工作组）已在2026年6月完成IMT-2030无线接口评估指南草案，纳入近场和空间非平稳信道模型；草案已送交Study Group 5（SG 5，第5研究组），计划于2026年12月审议。因此当前应称“草案已完成”，不能称正式标准。" },
+          { type: "sources", items: [
+            { label: "arXiv原文：FR3 XL-MIMO信道建模、算法评估与外场试验（提交于2026-08-04）", url: "https://arxiv.org/abs/2608.03783" },
+            { label: "arXiv原文：大规模相控阵VSWR鲁棒功放综述（提交于2026-07-31）", url: "https://arxiv.org/abs/2608.00351" },
+            { label: "ITU-R官方：IMT-2030评估指南草案进展（状态截至2026年）", url: "https://www.itu.int/en/ITU-R/study-groups/rsg5/rwp5d/imt-2030/pages/default.aspx" }
+          ] }
+        ],
+        tags: ["FR3", "XL-MIMO", "有源VSWR", "指标闭环"]
+      },
+      {
+        label: "CST × MATLAB",
+        title: "最小任务：验证端口域与完整模态域MVDR等价",
+        blocks: [
+          { type: "text", text: "目标是在60—90分钟内建立今天理论的数值基线。先用理想8阵元均匀圆阵完成MATLAB验证；若已有昨天的CST嵌入方向图，再替换理想导向向量。" },
+          { type: "list", items: [
+            "MATLAB：设N=8、阵列半径a=0.6λ。期望信号从方位角20°到达，单个防御性测试干扰从80°到达；设输入J/S依次为−10、0、10、20 dB，白噪声SNR固定为20 dB。首次实验只研究接收算法，不生成任何对外发射信号。",
+            "为每个J/S生成K=2000个复高斯快照。用不含期望信号的训练快照估计R̂ᵢ，并加对角加载R̃ᵢ=R̂ᵢ+δ·tr(R̂ᵢ)I/N；先取δ=10⁻³。",
+            "分别计算阵元域MVDR和完整DFT模态域MVDR。将模态域权值变回端口域，比较两者的权值、方向图和输出SINR；数值误差应接近浮点精度。",
+            "再只保留ℓ∈{−1,0,+1}三个模态，观察模态截断怎样改变期望增益、零陷深度和输出SINR。此时差异来自降维约束，不应归因于OAM创造了额外自由度。",
+            "CST可选：从昨天的逐端口嵌入方向图中，在期望与干扰方向抽取同一极化的复场值，分别组成hₛ与hⱼ；保证频率、坐标、端口参考阻抗和相位基准一致后重复上述计算。"
+          ] },
+          { type: "formula", text: "Δw = ‖w端口 − Fw模态‖₂/‖w端口‖₂；　Gnull = 10log₁₀(|wᴴhₛ|²/|wᴴhⱼ|²) dB" },
+          { type: "text", text: "Δw＝两种实现的相对权值误差，量纲为1；Gnull＝期望响应相对干扰响应的空间抑制度，单位dB。验收表至少记录J/S、δ、快照数、ρ、输出SINR、BER（可先留空）、Gnull和期望增益损失。" }
+        ],
+        tags: ["N=8", "K=2000", "对角加载", "模态截断"]
+      },
+      {
+        label: "论文精读",
+        title: "层叠智能超表面怎样合成并分离近场OAM模态",
+        tone: "accent",
+        blocks: [
+          { type: "text", text: "Torcolacci与Dardari于2026年7月10日提交的原始预印本研究Stacked Intelligent Metasurface（SIM，层叠智能超表面）辅助的Holographic Multiple-Input Multiple-Output（HMIMO，全息多输入多输出）近场链路。SIM由多层可编程超表面单元组成，意图在电磁传播域完成相位变换，减少完全数字化的大量射频链路。" },
+          { type: "heading", text: "研究问题" },
+          { type: "text", text: "离散、仅相位控制的SIM能否近似连续孔径OAM基，并在辐射近场形成多个可分离通道？阵面尺寸、单元密度和层数分别限制什么：可支持模态阶数，还是模态间串扰？" },
+          { type: "heading", text: "方法" },
+          { type: "text", text: "论文采用标量、单极化、Line-of-Sight（LOS，视距）近场Green函数建立端到端模型，并以归一化复相关作为目标，使合成场同时保持幅度加权的螺旋相位。作者使用多起点梯度优化与Adam（Adaptive Moment Estimation，自适应矩估计优化器）分别配置发射和接收SIM，再以每模态SINR、相关度与可达和速率评价。" },
+          { type: "formula", text: "G(r,s)=exp(−jk‖r−s‖)/(4π‖r−s‖)；　fℓ(p)=A⁻¹ᐟ²exp(jℓφ)" },
+          { type: "text", text: "r与s＝接收面和发射面位置向量，单位m；k＝自由空间波数，单位rad/m；A＝孔径面积，单位m²；ℓ＝OAM拓扑荷，整数；φ＝横截面方位角，单位rad。物理图像是每个发射面点经球面波传播到接收面，再由多层相位单元把这些路径重新组合成目标螺旋场。" },
+          { type: "heading", text: "结果与证据边界" },
+          { type: "list", items: [
+            "在论文设定中，M=400个超表面单元时，除ℓ=0外多数模态的SINR为负；增大层数能整体改善，却不能补偿孔径不足。M=3600时，高阶模态相对小孔径情形约改善10–15 dB。",
+            "和速率随层数先明显增长，在约8层以后出现收益递减；作者据此区分“孔径/采样限制可支持的阶数”和“层深控制串扰”的作用。",
+            "这些是特定数值模型的结果，不是通用硬件指标。论文假设单极化标量场、视距近轴配置、相位-only且彼此不耦合的λ/2单元；未给出真实制造误差、损耗、宽带色散、功耗或外部干扰测量。"
+          ] },
+          { type: "heading", text: "对课题的可复现价值" },
+          { type: "text", text: "最值得复现的不是复杂SIM优化，而是它的评价框架：在相同孔径与接收几何下建立模态传输矩阵，逐模态计算期望功率、跨模态干扰和噪声，再观察孔径截断如何限制高阶ℓ。可先用CST均匀圆阵或理想连续孔径替代SIM，复现“孔径增大”和“模式变换精度提高”对SINR的不同作用。" },
+          { type: "sources", items: [
+            { label: "arXiv原文：OAM-Enabled Holographic MIMO Communications with Stacked Intelligent Metasurfaces（2026-07-10）", url: "https://arxiv.org/abs/2607.09479" },
+            { label: "arXiv HTML全文：数值设置、SINR与局限可直接核对", url: "https://arxiv.org/html/2607.09479v1" }
+          ] }
+        ],
+        tags: ["SIM", "HMIMO", "近场Green函数", "孔径与串扰"]
+      },
+      {
+        label: "术语与思考题",
+        title: "把输入难度、空间结构和输出性能分开",
+        layout: "wide",
+        blocks: [
+          { type: "list", items: [
+            "Jam-to-Signal ratio（J/S，干信比）：接收输入端干扰功率与期望信号功率之比；本期用它扫描测试难度，而不是当作算法输出。",
+            "Signal-to-Interference-plus-Noise Ratio（SINR，信干噪比）：期望信号功率与干扰加噪声功率之比；本期比较阵元域、完整模态域和截断模态域接收器。",
+            "Interference covariance matrix（干扰协方差矩阵）：描述各端口干扰功率及端口间相关性的矩阵；本期它决定MVDR把零陷放在哪里。",
+            "Channel State Information（CSI，信道状态信息）：接收机或发射机掌握的信道幅相信息；本期要求明确是完美、估计还是仅统计CSI。",
+            "Minimum Variance Distortionless Response（MVDR，最小方差无失真响应）：保持期望信号响应不变并最小化输出干扰加噪声功率的线性接收器；本期用作公平基线。",
+            "Diagonal loading（DL，对角加载）：给样本协方差加一个正的单位矩阵项；本期用来改善有限快照下求逆稳定性和轻度模型失配鲁棒性。",
+            "Frequency Range 3（FR3，6–24 GHz新中频段）：介于传统蜂窝中低频与毫米波之间的研究频段称呼；本期用其近期预印本观察大孔径信道建模需求。",
+            "Mode truncation（模态截断）：只保留部分OAM/DFT模态进行处理；本期用它区分坐标变换与真正的降维约束。"
+          ] },
+          { type: "heading", text: "思考题" },
+          { type: "text", text: "若8阵元圆阵的期望信号主要落在ℓ=+1模态，干扰主要落在ℓ=−1模态，固定模态选择看似可以轻松抑制。现在让接收阵列横向偏移，并使期望/干扰的模态响应相关系数ρ从0.1升到0.9：请比较固定ℓ=+1选择器、三模态MVDR和全端口MVDR的输出SINR、期望增益损失与快照需求；说明在什么条件下“模态先验”能降低估计方差，又在什么条件下会变成有害偏差。" }
+        ],
+        tags: ["J/S", "SINR", "CSI", "研究生思考题"]
+      }
+    ]
+  },
+  {
     issue: 6,
     date: "2026-08-04",
     dateLabel: "2026年8月4日 · ISSUE 06",
