@@ -1,5 +1,182 @@
 window.DAILY_BRIEFS = [
   {
+    issue: 8,
+    date: "2026-08-06",
+    dateLabel: "2026年8月6日 · ISSUE 08",
+    updatedAt: "2026-08-06 10:23",
+    title: "波束与模态联合抗干扰：把多个保护目标写进同一组约束",
+    summary: "从Linearly Constrained Minimum Variance（LCMV，线性约束最小方差）接收器出发，解释如何同时保持目标OAM模态、抑制若干干扰方向，并用零陷深度、最坏情形输出SINR和BER衡量鲁棒性。结合2026年8月5日公开的近场Airy波束与多普勒感知MIMO资料，区分结构化波束的传播优势、抗干扰能力和仍需实验验证的主张。",
+    readingMinutes: 25,
+    modules: [
+      {
+        label: "今日结论",
+        title: "联合抗干扰的核心不是换一种波束名称，而是把保护与抑制同时约束",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "list", items: [
+            "Linearly Constrained Minimum Variance（LCMV，线性约束最小方差）把多个线性要求同时写入接收权值：例如保持目标Orbital Angular Momentum（OAM，轨道角动量）模态单位增益，并在一个或多个干扰方向形成零响应。直观上，它先钉住不能破坏的信号，再在剩余自由度里降低干扰和噪声。",
+            "一个N端口阵列最多提供N维复空间。K个彼此独立的等式约束会消耗K个自由度；约束过多、约束向量接近共线或阵列校准不准时，深零陷会变得脆弱，并可能放大白噪声。",
+            "OAM模态标签不能替代空间信道约束。应把期望模态、同模态多径、邻近模态泄漏和外部干扰都投影到同一端口域模型，再比较固定模态滤波、截断模态LCMV和全端口LCMV。",
+            "工程结论应至少同时给出Jam-to-Signal ratio（J/S，干信比）、输出Signal-to-Interference-plus-Noise Ratio（SINR，信干噪比）、Bit Error Rate（BER，误码率）、零陷深度、目标增益损失和计算/功耗代价。单独报告理想角度上的零点不足以证明鲁棒抗干扰。",
+            "近7日发现两项可核对的新资料：2026年8月5日提交的近场Airy波束遮挡缓解预印本，以及同日提交、含测量结果的近场MIMO多普勒定位预印本。前者说明结构化波束可改变能量路径，后者说明大孔径下运动会带来阵元相关模型失配；二者都不是OAM抗干扰性能的直接证明。"
+          ] },
+          { type: "sources", items: [
+            { label: "arXiv原文：Physics-Guided Neural Airy Beamforming for Near-Field Blockage Mitigation（提交于2026-08-05）", url: "https://arxiv.org/abs/2608.04388" },
+            { label: "arXiv原文：Near-Field Velocity Estimation and Doppler-Aware Localization in OFDM Massive MIMO（提交于2026-08-05）", url: "https://arxiv.org/abs/2608.05133" }
+          ] }
+        ],
+        tags: ["LCMV", "多约束零陷", "OAM抗干扰", "鲁棒性"]
+      },
+      {
+        label: "核心理论",
+        title: "从单约束MVDR推进到多约束LCMV",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "text", text: "直观解释：昨天的Minimum Variance Distortionless Response（MVDR，最小方差无失真响应）像一名只被要求保护一个方向的调音师。LCMV允许给它一张更完整的清单：目标模态必须保持，校准误差附近的几个样本也要保持，同时对已知干扰方向或干扰模态给出零响应。权值不是逐条独立设计，而是在全部约束下共同寻找最小输出功率解。" },
+          { type: "heading", text: "条件与变量：先把端口域、波束域和模态域放进同一记号" },
+          { type: "text", text: "设N＝接收端口数，量纲为1；y∈ℂᴺ＝一次窄带复基带接收快照；w∈ℂᴺ＝复接收权值；Rᵢ₊ₙ∈ℂᴺˣᴺ＝干扰加噪声协方差矩阵，单位可取W；C＝[c₁,…,cK]∈ℂᴺˣᴷ＝K个约束响应向量组成的矩阵；f∈ℂᴷ＝每个约束的期望复响应。上标H表示共轭转置。物理图像是每一列cₖ描述一种必须辨认的空间签名，它既可以是到达方向导向向量，也可以是经过真实信道后的OAM模态响应。" },
+          { type: "formula", text: "min_w  wᴴRᵢ₊ₙw，约束 Cᴴw=f" },
+          { type: "text", text: "若Rᵢ₊ₙ可逆、C的列在Rᵢ₊ₙ⁻¹加权意义下线性独立，则闭式解如下。Rᵢ₊ₙ⁻¹先压低高干扰方向，后面的矩阵因子再把结果校正到全部约束同时满足。K＝1且f＝1时，它退化为上一期的MVDR。" },
+          { type: "formula", text: "wLCMV=Rᵢ₊ₙ⁻¹C(CᴴRᵢ₊ₙ⁻¹C)⁻¹f" },
+          { type: "heading", text: "怎样写一个OAM联合约束" },
+          { type: "text", text: "设h₊₁＝目标ℓ＝+1 OAM模态经过传播、接收孔径和互耦后的端口响应；g₁、g₂＝两个干扰空间响应。ℓ＝拓扑荷，量纲为1，表示绕轴一周的相位变化为2πℓ。最简单的约束可写成C＝[h₊₁,g₁,g₂]、f＝[1,0,0]ᵀ：目标单位通过，两路干扰置零。这里使用的是实际端口响应，而不是理想Discrete Fourier Transform（DFT，离散傅里叶变换）列向量。" },
+          { type: "formula", text: "C=[h₊₁,g₁,g₂]；f=[1,0,0]ᵀ；Cᴴw=f" },
+          { type: "heading", text: "自由度、白噪声增益与失配" },
+          { type: "text", text: "K越接近N，可用于降低剩余干扰的自由度越少。若两列约束几乎平行，矩阵CᴴRᵢ₊ₙ⁻¹C会病态，权值范数可能很大。White Noise Gain（WNG，白噪声增益）常定义为1/(wᴴw)，量纲为1；在目标响应归一化时，WNG越低通常表示接收器越容易放大独立端口噪声和幅相误差。" },
+          { type: "formula", text: "WNG=1/(wᴴw)；约束余量 e=Cᴴw−f" },
+          { type: "text", text: "零陷深度ND可相对主瓣响应定义。aⱼ＝干扰导向向量；aₛ＝目标导向向量；ND的单位为dB，数值越负表示理想零陷越深。但真正应报告的是角度、频率、阵元误差和信道快照扫描后的最坏值或分位数，而不是单一设计点。" },
+          { type: "formula", text: "ND=20log₁₀(|wᴴaⱼ|/|wᴴaₛ|) dB" },
+          { type: "heading", text: "与课题的关系" },
+          { type: "text", text: "OAM抗干扰可以被表述为结构化约束设计：目标模态提供应保持的子空间，外部干扰与跨模态泄漏提供应抑制的子空间。真正的研究问题不是LCMV公式本身，而是C如何从CST全波端口响应、接收几何和有限快照中可靠获得，以及在模型失配下应保护一个向量、一个角域扇区还是一个模态子空间。" },
+          { type: "sources", items: [
+            { label: "IEEE DOI：Frost, An Algorithm for Linearly Constrained Adaptive Array Processing（1972）", url: "https://doi.org/10.1109/TAP.1972.1140126" },
+            { label: "IEEE DOI：Capon, High-Resolution Frequency-Wavenumber Spectrum Analysis（1969）", url: "https://doi.org/10.1109/PROC.1969.7278" }
+          ] }
+        ],
+        tags: ["LCMV", "约束矩阵C", "WNG", "零陷深度"]
+      },
+      {
+        label: "课题连接",
+        title: "把合理结论、适用条件和待验证主张分三层",
+        tone: "accent",
+        blocks: [
+          { type: "heading", text: "合理结论" },
+          { type: "list", items: [
+            "若期望信号与干扰在N端口观测空间中可分，且约束数小于可用秩，LCMV能够在保持目标响应的同时抑制指定干扰。这是线性代数结论，与是否使用OAM标签无关。",
+            "对完整正交DFT模态集合做无损变换，不会凭空增加自由度；但只保留少数物理上合理的OAM模态可以形成降维先验。在快照少而模态泄漏可控时，这种先验可能降低协方差估计方差。",
+            "把目标ℓ＝+1附近的ℓ＝0、+1、+2响应共同设为软保护或子空间保护，可降低偏轴造成的目标自消风险；代价是占用更多自由度并可能降低可形成的零陷深度。"
+          ] },
+          { type: "heading", text: "适用条件" },
+          { type: "text", text: "公平实验必须固定物理孔径、端口数、射频通道数、总接收功率标定、训练快照数、Channel State Information（CSI，信道状态信息）质量、频率采样和校准误差。CSI是接收器掌握的复信道响应，像一张随环境变化的空间地图；若用理想CSI设计而用失配信道测试，必须说明误差分布和更新时间。" },
+          { type: "heading", text: "仍有争议或待验证" },
+          { type: "list", items: [
+            "不能从理想OAM模态正交直接推出复杂多径、偏轴或有限孔径下的BER优势。需要把端口域最优接收器、固定OAM滤波器和模态域LCMV放在同一信道与射频预算下比较。",
+            "不能把对遮挡的绕行或自愈性质直接称为抗干扰。遮挡改变期望传播路径，主动或环境干扰则进入协方差和约束设计；两者可能共享阵列实现，却是不同验证问题。",
+            "深零陷对幅相误差、互耦、宽带波束斜视和干扰角漂移很敏感。若只在单频、单角和完美校准下得到−60 dB零点，这更像数值设计点，不是可部署性能。"
+          ] },
+          { type: "formula", text: "建议主结果：min_{误差集合} SINRout；辅助结果：BER(J/S)、ND最坏值、WNG、目标增益损失" }
+        ],
+        tags: ["合理结论", "适用条件", "待验证主张", "公平基线"]
+      },
+      {
+        label: "行业需求",
+        title: "把结构化波束、近场感知和高可靠链路翻译为可测指标",
+        layout: "wide",
+        blocks: [
+          { type: "text", text: "截至2026年8月6日，近7日没有发现已经进入标准或商用产品、且能直接证明OAM抗干扰优势的新公告。以下两项近期预印本用于观察研究变量；ITU-R资料用于观察标准评估方向。证据强度按“官方评估框架、含测量论文、纯仿真预印本”依次降低。" },
+          { type: "heading", text: "相控阵与结构化近场：从指向角扩展到轨迹和场景几何" },
+          { type: "list", items: [
+            "中等证据：2026年8月5日的Airy波束预印本在140 GHz、1 GHz带宽、256阵元半波距Uniform Linear Array（ULA，均匀线阵）仿真中，根据接收机和障碍物边缘几何一次预测弯曲轨迹。论文报告4.7K参数模型在360个独立场景上保留数值参考速率的99.70%，而有限扫描需发射23至429个候选波束。应转化为：阻挡比例扫描、接收功率/速率损失、训练波束数、推理时延、阵列幅相量化和模型外几何误差。",
+            "较强但间接证据：2026年8月5日的近场Orthogonal Frequency Division Multiplexing（OFDM，正交频分复用）大规模MIMO论文包含测量结果，指出大孔径下阵元相关双基地多普勒会造成定位模型失配；其方法把整体定位误差从0.268 m降至0.064 m。对抗干扰阵列的启示是：移动目标或平台会让约束向量随阵元和时间变化，应测约束更新速率、失配下最坏SINR和跟踪开销，而不能只用静态导向向量。",
+            "官方强证据：ITU-R的IMT-2030评估指南草案已纳入近场、空间非平稳和Integrated Sensing and Communication（ISAC，通感一体化）相关扩展信道模型，但草案仍待2026年12月由上级研究组审批。工程需求应落为指定测试环境下的覆盖、频谱效率、时延、可靠性、感知精度、能耗和复杂度，而不是宣称某一种波束必然成为标准方案。"
+          ] },
+          { type: "heading", text: "面向个人课题的指标清单" },
+          { type: "list", items: [
+            "天线与射频：工作带宽，单位Hz；实现增益，单位dBi；扫描范围，单位°；总效率，单位%；端口Active Voltage Standing Wave Ratio（Active VSWR，有源电压驻波比），量纲为1；移相/幅控位数；单波束功耗与校准周期。",
+            "OAM与结构化场：模态纯度，单位%；目标模态接收功率；跨模态串扰，单位dB；偏轴、倾斜、频偏和孔径截断下的最坏模态泄漏；若使用Airy类波束，再加轨迹误差和遮挡后恢复距离，单位m。",
+            "抗干扰链路：输入J/S，单位dB；输出SINR，单位dB；BER；零陷深度，单位dB；干扰角漂移范围，单位°；快照数；权值更新时间，单位s；WNG和目标增益损失。",
+            "工程约束：射频通道数、每次推理乘加量、权值存储、峰均功率比、功耗、物料成本与标定工时。证据应注明是解析、仿真、暗室测量、外场测量还是标准要求。"
+          ] },
+          { type: "sources", items: [
+            { label: "arXiv全文：Physics-Guided Neural Airy Beamforming，模型、仿真与局限（2026-08-05）", url: "https://arxiv.org/html/2608.04388v1" },
+            { label: "arXiv原文：近场多普勒感知定位，含测量结果（2026-08-05）", url: "https://arxiv.org/abs/2608.05133" },
+            { label: "ITU-R官方：IMT-2030评估指南与技术性能要求进展（状态截至2026年）", url: "https://www.itu.int/en/ITU-R/study-groups/rsg5/rwp5d/imt-2030/pages/default.aspx" }
+          ] }
+        ],
+        tags: ["Airy波束", "近场多普勒", "IMT-2030", "可测指标"]
+      },
+      {
+        label: "CST × MATLAB",
+        title: "用一次可执行小实验比较固定模态、三模态LCMV与全端口LCMV",
+        tone: "accent",
+        blocks: [
+          { type: "heading", text: "目标与输入" },
+          { type: "text", text: "在CST中沿用上一期的N端口均匀圆阵模型。选择一个中心频点f₀，分别导出目标源和两个不同方向干扰源照射时的N端口复接收电压，或用逐端口嵌入方向图在MATLAB中合成这些响应。三列分别记为hₛ、g₁、g₂。所有数据使用同一参考阻抗、端口顺序和复数相位参考。" },
+          { type: "heading", text: "MATLAB最小任务" },
+          { type: "list", items: [
+            "建立20个独立噪声快照和100个干扰加噪声训练快照，构造样本协方差R̂。记录随机种子，使结果可复现。",
+            "方法A：只取DFT后的ℓ＝+1模态；方法B：保留ℓ＝0、+1、+2三个模态，在三维子空间内做LCMV；方法C：直接在全部N个端口上做LCMV。三种方法使用相同训练快照和输入J/S。",
+            "先在标称模型下设计，再给每个端口加入独立幅度误差±0.5 dB、相位误差±3°，并让一个干扰到达角偏移0°至5°。这些只是学习用起始扫描值，不是部署指导；实验对象是接收算法鲁棒性。",
+            "对每种方法画四条曲线：输出SINR对J/S、BER对J/S、最坏零陷深度对角度偏移、WNG对训练快照数。额外记录目标响应|wᴴhₛ|的损失。"
+          ] },
+          { type: "formula", text: "R̂=(1/L)Σₜ yₜyₜᴴ+δI；δ＝对角加载强度，单位与R̂一致" },
+          { type: "heading", text: "通过标准" },
+          { type: "text", text: "先检查约束残差‖Cᴴw−f‖₂是否接近数值精度，再解释性能。若全端口LCMV标称最好但误差扫描迅速恶化，而三模态LCMV稍低却更稳定，这支持“结构先验降低估计方差”的条件性结论；若固定ℓ＝+1在偏轴后目标增益明显下降，则说明模态选择器把目标泄漏误当成干扰。不要只保留最好的一次随机结果，应至少报告中位数与10%分位数。" }
+        ],
+        tags: ["CST端口响应", "MATLAB LCMV", "三基线对照", "误差扫描"]
+      },
+      {
+        label: "论文精读",
+        title: "精读：物理引导Airy波束如何绕开遮挡，以及它尚未回答什么",
+        layout: "wide",
+        blocks: [
+          { type: "heading", text: "论文与研究问题" },
+          { type: "text", text: "Wang与Dai的预印本《Physics-Guided Neural Airy Beamforming for Near-Field Blockage Mitigation》提交于2026年8月5日。问题是：高频近场Line of Sight（LoS，视距）链路被障碍物部分遮挡时，怎样不做大规模波束扫描，就选择一条接近最优的Airy弯曲能量轨迹。Airy波束是一类主瓣沿弯曲路径传播、有限能量实现可在部分遮挡后重构的结构化场；直观上，它不是把直线波束变强，而是改变主要能量经过空间的位置。" },
+          { type: "heading", text: "方法" },
+          { type: "text", text: "论文采用单边缘、有限孔径、标量Fresnel衍射模型。Fresnel衍射是近轴条件下描述有限距离波场传播的近似；它保留二次相位，因此能表达近场聚焦和边缘绕射。作者把接收功率写成未遮挡贡献与边缘衍射贡献的共同结果，推导驻点与Karush–Kuhn–Tucker（KKT，带约束最优性条件）候选，得到只占完整候选区约6%的物理紧致区域。随后用Multilayer Perceptron（MLP，多层感知机）把接收机位置、障碍边缘和遮挡比例映射为两个轨迹坐标，再解析生成256阵元权值。" },
+          { type: "formula", text: "g=[zᵣ,xᵣ,zₒ,xₑ,s,ρ]ᵀ；(η̂w,β̂)=fϑ(g)" },
+          { type: "text", text: "zᵣ、xᵣ＝接收机纵向与横向位置，单位m；zₒ、xₑ＝障碍边缘位置，单位m；s＝未遮挡侧符号，量纲为1；ρ＝孔径遮挡比例，量纲为1；η̂w、β̂＝归一化轨迹坐标，量纲为1。物理图像是先把场景压缩为边缘几何，再让小网络只在物理允许的轨迹附近选点。" },
+          { type: "heading", text: "结果" },
+          { type: "list", items: [
+            "仿真使用140 GHz载频、1 GHz带宽、256阵元半波距ULA和360个独立测试场景。4.7K参数预测器一次发射一个波束，平均速率7.123 Gbit/s；数值参考为7.144 Gbit/s，即保留99.70%。",
+            "有限扫描基线需要23、145或429个发射波束，平均速率范围为5.769至6.918 Gbit/s。论文由此支持的是在其模型与场景分布下减少波束训练开销。",
+            "与531K参数的纯数据驱动网络相比，4.7K参数模型少约112倍参数，平均速率只低0.019 Gbit/s。该结果说明物理坐标可有效压缩学习问题，但不自动证明真实硬件中的同等差距。"
+          ] },
+          { type: "heading", text: "局限与可复现价值" },
+          { type: "text", text: "作者明确使用单边缘、二维标量Fresnel模型，假设场景几何已知；尚未覆盖多边缘、Uniform Planar Array（UPA，均匀平面阵）、感知误差和硬件约束。论文结果是仿真，不含外部干扰、OAM模态纯度或BER测试，因此不能作为OAM抗干扰证据。最值得复现的是它的评估纪律：同功率比较、独立场景划分、把在线发射波束数作为开销，并用模型外误差检查物理引导表示。可先在CST里用金属屏边缘建立同尺度模型，验证标量Fresnel结果与全波结果在哪些距离和遮挡比例下分离。" },
+          { type: "sources", items: [
+            { label: "arXiv摘要与提交记录：Wang & Dai（2026-08-05）", url: "https://arxiv.org/abs/2608.04388" },
+            { label: "arXiv HTML全文：系统模型、算法、360场景结果与附录参数", url: "https://arxiv.org/html/2608.04388v1" },
+            { label: "3GPP官方规范页：TR 38.901信道模型文档记录", url: "https://www.3gpp.org/dynareport/38901.htm" }
+          ] }
+        ],
+        tags: ["Airy beam", "Fresnel衍射", "物理引导学习", "证据边界"]
+      },
+      {
+        label: "术语与思考题",
+        title: "把约束、自由度、鲁棒性和结构化传播串起来",
+        layout: "wide",
+        blocks: [
+          { type: "list", items: [
+            "Linearly Constrained Minimum Variance（LCMV，线性约束最小方差）：在满足多个线性响应约束时最小化输出功率；本期用它统一目标OAM模态保护与多个干扰零陷。",
+            "Orbital Angular Momentum（OAM，轨道角动量）：带有exp(jℓφ)方位相位因子的波场属性；本期把经过真实信道后的OAM响应作为约束向量，而不是天然抗干扰标签。",
+            "White Noise Gain（WNG，白噪声增益）：归一化目标响应下常写为1/(wᴴw)；本期用它观察大权值是否放大独立端口噪声与校准误差。",
+            "Null Depth（ND，零陷深度）：干扰方向响应相对目标响应的dB值；本期要求报告频率、角度和误差扫描后的最坏值，而非单点零点。",
+            "Channel State Information（CSI，信道状态信息）：链路复幅相响应的已知或估计信息；本期它决定LCMV约束向量与协方差是否贴近真实环境。",
+            "Line of Sight（LoS，视距）：发射机与接收机之间无遮挡的直接传播路径；本期Airy论文针对LoS被部分遮挡后的能量路径选择。",
+            "Fresnel diffraction（菲涅耳衍射）：近轴条件下保留二次相位的有限距离衍射近似；本期用于描述阵列、障碍边缘与接收窗口之间的波场传播。",
+            "Karush–Kuhn–Tucker（KKT，带约束最优性条件）：约束优化问题候选最优点需满足的一组条件；本期Airy论文用它缩小轨迹搜索区域。"
+          ] },
+          { type: "heading", text: "研究生层次思考题" },
+          { type: "text", text: "一个16端口均匀圆阵接收ℓ＝+1目标，同时存在两个角度相近的干扰。方案A在全端口域设置目标单位增益和两个零响应；方案B先保留ℓ＝0、+1、+2，再在三模态域设置相同逻辑约束。若接收阵列产生横向偏移，使目标和第一干扰的归一化相关系数从0.2升到0.95，请推导两种方案的可行性与自由度变化，并设计一个包含WNG、最坏输出SINR、目标增益损失和BER的实验，判断何时模态降维降低估计方差，何时它因丢弃有用分量而形成不可恢复的偏差。" }
+        ],
+        tags: ["8个术语", "LCMV", "Airy", "研究生思考题"]
+      }
+    ]
+  },
+  {
     issue: 7,
     date: "2026-08-05",
     dateLabel: "2026年8月5日 · ISSUE 07",
