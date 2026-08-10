@@ -1,5 +1,184 @@
 window.DAILY_BRIEFS = [
   {
+    issue: 9,
+    date: "2026-08-09",
+    dateLabel: "2026年8月9日 · ISSUE 09",
+    updatedAt: "2026-08-09 15:56",
+    title: "CST × MATLAB联合验证：让端口、坐标与相位约定闭环",
+    summary: "围绕CST全波模型与MATLAB信号处理之间的数据链，解释怎样统一端口顺序、复数相位、坐标系、功率归一化和模态投影，并用能量守恒、往返重构误差与解析基线发现静默错误。近7日未发现足够可靠的新动态，本期以权威工具文档和可复现近场建模论文推进方法主线。",
+    readingMinutes: 23,
+    modules: [
+      {
+        label: "今日结论",
+        title: "联合验证的第一成果不是漂亮曲线，而是一条能自证正确的数据链",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "list", items: [
+            "CST Studio Suite（CST，三维全波电磁仿真软件）与MATLAB联合验证的核心，是让同一个物理量在两个软件中保持同一端口顺序、坐标系、单位和相位符号。直观上，这像把两把尺子的零点和刻度先对齐，再比较测量结果。",
+            "复电场或端口电压必须保留实部与虚部，不能只导出幅度。相位决定Orbital Angular Momentum（OAM，轨道角动量）模态之间是相加还是相消；丢掉相位后，模态谱和零陷结果都不可恢复。",
+            "Discrete Fourier Transform（DFT，离散傅里叶变换）可以把均匀圆阵端口数据投影到OAM模态域，但指数正负号、阵元方位角起点和顺逆时针编号会共同决定拓扑荷ℓ的正负。最可靠的检查是先用人工构造的单模态向量做往返重构。",
+            "联合验证至少需要三类闭环：数据闭环检查导入导出，物理闭环检查功率与对称性，算法闭环比较端口域和完整模态域结果。任一闭环失败时，不应继续解释Signal-to-Interference-plus-Noise Ratio（SINR，信干噪比）或Bit Error Rate（BER，误码率）。",
+            "截至北京时间2026年8月9日，近7日未发现足够可靠、且直接关联CST/MATLAB、OAM阵列或抗干扰验证的新动态。本期不制造热点，改用2026年2月12日ETH Zürich实验室原始发布、对应预印本与官方软件文档作为方法证据。"
+          ] },
+          { type: "sources", items: [
+            { label: "ETH Zürich实验室原始发布：Physically Consistent Evaluation of Commonly Used Near-Field Models（2026-02-12）", url: "https://iip.ethz.ch/news-and-events/iip-news/2026/02/preprint-of-our-new-paper-on-physically-consistent-evaluation-of-commonly-used-near-field-models-now-available-on-arxiv.html" },
+            { label: "arXiv原文：Physically Consistent Evaluation of Commonly Used Near-Field Models", url: "https://arxiv.org/abs/2602.10976" }
+          ] }
+        ],
+        tags: ["数据闭环", "相位约定", "OAM模态投影", "可复现验证"]
+      },
+      {
+        label: "核心理论",
+        title: "从N个端口复数样本到可逆的OAM模态谱",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "text", text: "直观解释：把N个圆周端口想成N只同时记录幅度和相位的传感器。OAM模态投影不是创造新信息，而是询问这些端口样本与每一种螺旋相位模板有多相似。若模板与端口编号约定一致，一个纯ℓ模态应集中到一个谱线；若约定相反，谱线会镜像到−ℓ。" },
+          { type: "heading", text: "条件与变量：先固定几何、单位和符号" },
+          { type: "text", text: "设N＝均匀圆阵端口数，量纲为1；n＝端口索引，取0至N−1；φₙ＝第n个端口的方位角，单位rad；xₙ＝同一参考面上的复端口电压或复场样本，其单位由导出量决定，可为V或V/m；ℓ＝拓扑荷，量纲为1；j＝虚数单位。物理图像是exp(jℓφₙ)给每个端口贴上一张理想螺旋相位标签。" },
+          { type: "formula", text: "φₙ=φ₀+s·2πn/N；s=+1表示按约定方向递增，s=−1表示反向编号" },
+          { type: "text", text: "采用下式定义模态系数aℓ。负指数表示用共轭模板做内积；若CST中的方位角方向或时间因子约定与此相反，ℓ的符号会翻转，但总能量不应改变。不要靠记忆判断正负，应以人工单模态测试锁定约定。" },
+          { type: "formula", text: "aℓ=(1/√N)Σₙ₌₀ᴺ⁻¹ xₙ exp(−jℓφₙ)" },
+          { type: "heading", text: "公式：模态纯度与往返重构" },
+          { type: "text", text: "Pℓ＝第ℓ模态的功率代理，单位随|xₙ|²而定；ηℓ＝模态纯度，量纲为1，通常以百分比报告。若使用完整的N个正交模态，DFT矩阵F是酉矩阵，端口域能量与模态域能量相等。直观上，完整模态变换只是旋转坐标轴，不会改变信号总长度。" },
+          { type: "formula", text: "Pℓ=|aℓ|²；ηℓ=Pℓ/ΣₘPₘ；a=Fᴴx；x̂=Fa；‖x‖₂²=‖a‖₂²" },
+          { type: "text", text: "若只保留集合S中的少数模态，重构误差εrec会包含被截断的真实能量、噪声和坐标失配。εrec＝相对重构误差，量纲为1；它越小，说明所选模态子空间越能解释端口数据，但这不等于通信性能一定更好。" },
+          { type: "formula", text: "εrec=‖x−FₛFₛᴴx‖₂/‖x‖₂" },
+          { type: "heading", text: "与课题的关系" },
+          { type: "text", text: "在OAM抗干扰课题中，目标信号、跨模态泄漏和外部干扰最终都以端口复响应进入接收器。先证明F的构造、CST数据与MATLAB数据满足能量守恒和往返重构，之后再比较固定模态选择、模态域自适应接收与全端口接收，才可能把算法差异与数据约定错误区分开。" },
+          { type: "sources", items: [
+            { label: "MathWorks官方文档：fft——离散傅里叶变换", url: "https://www.mathworks.com/help/matlab/ref/fft.html" },
+            { label: "MathWorks官方文档：readmatrix——从文本或表格文件读取矩阵", url: "https://www.mathworks.com/help/matlab/ref/readmatrix.html" }
+          ] }
+        ],
+        tags: ["DFT", "拓扑荷ℓ", "模态纯度", "重构误差"]
+      },
+      {
+        label: "课题连接",
+        title: "把可证明的坐标等价、适用条件和待验证主张分开",
+        tone: "accent",
+        blocks: [
+          { type: "heading", text: "合理结论" },
+          { type: "list", items: [
+            "完整酉DFT变换下，端口域与模态域保存相同信息；若使用相同信道、约束和数值精度，最优线性接收器可达到相同输出SINR。差异通常来自模态截断、正则化、先验约束或实现误差。",
+            "CST逐端口嵌入方向图包含阵元位置、单元方向图、互耦和平台散射的综合响应。用这些响应合成OAM波束，比只用理想阵列因子更接近真实硬件。",
+            "能量守恒、共轭对称性和往返重构是发现端口乱序、度与弧度混用、dB与线性量混用以及相位符号翻转的低成本检查。"
+          ] },
+          { type: "heading", text: "适用条件" },
+          { type: "text", text: "上述DFT关系要求端口沿方位角均匀采样，并且每一列数据对应同一频点、极化分量、参考阻抗和相位参考。若阵元不等间距、接收圆偏轴或只采样局部孔径，应使用实际角度构造非均匀模态矩阵，并检查其条件数；此时简单FFT不再自动正交。" },
+          { type: "formula", text: "Gₙℓ=exp(jℓφₙ)/√N；κ(G)=σmax(G)/σmin(G)" },
+          { type: "text", text: "κ(G)＝模态矩阵条件数，量纲为1；σmax与σmin分别是最大和最小奇异值。κ越大，测量噪声和幅相误差越容易被模态反演放大。" },
+          { type: "heading", text: "仍有争议或待验证" },
+          { type: "list", items: [
+            "模态纯度高不能单独证明抗干扰优势。还需在相同物理孔径、射频通道、输入Jam-to-Signal ratio（J/S，干信比）和Channel State Information（CSI，信道状态信息）质量下报告输出SINR与BER。",
+            "仿真中的深零陷不能直接外推到硬件。连接器、馈线、温漂、量化、互耦模型误差和接收几何偏移都可能填平零陷，应报告误差扫描后的分位数或最坏值。",
+            "全波求解器与简化传播模型吻合，只能说明所测场景内的近似有效；频率、距离、障碍物或极化改变后，需要重新验证误差边界。"
+          ] },
+          { type: "text", text: "本期只讨论接收端、防御性和学术性验证，不提供对外发射干扰的设备参数或部署方法。" }
+        ],
+        tags: ["酉等价", "嵌入方向图", "条件数", "证据边界"]
+      },
+      {
+        label: "行业需求",
+        title: "近7日热点不足：工程需求转向可追溯模型与误差预算",
+        layout: "wide",
+        priority: "证据分级",
+        blocks: [
+          { type: "text", text: "截至2026年8月9日，近7日未发现足够可靠、可由一手来源核验，且直接关联OAM阵列、CST/MATLAB联合验证或高可靠抗干扰通信的新动态。以下采用发布日期更早的权威与原始资料，不称为本周热点。" },
+          { type: "heading", text: "A｜全波模型与通信模型必须可追溯（中等证据：大学实验室原始发布与预印本，2026-02-12）" },
+          { type: "text", text: "ETH Zürich团队使用Ansys High Frequency Structure Simulator（HFSS，高频结构仿真器）提取离散空间坐标上的全波近场模型，再评估常用近场近似。实验室原始发布指出，常见模型足以完成基础聚焦，却可能错误预测旁瓣和Reconfigurable Intelligent Surface（RIS，可重构智能表面）的频率相关行为，原因之一是忽略镜面反射。对阵列岗位和课题的翻译是：不仅交付峰值增益，还要交付数据来源、网格/边界设置、坐标定义、旁瓣误差和跨频误差。" },
+          { type: "heading", text: "B｜标准评估关注端到端可测性能（强证据：ITU-R官方评估入口，状态以页面为准）" },
+          { type: "text", text: "International Telecommunication Union Radiocommunication Sector（ITU-R，国际电信联盟无线电通信部门）的IMT-2030候选技术流程以技术性能要求、提交模板和评估指南组织证据。OAM或结构化场若进入系统论证，仍要落到覆盖、吞吐、时延、可靠性、频谱效率和能耗等指标；模态名称本身不是性能指标。" },
+          { type: "heading", text: "把笼统需求翻译为可测量清单" },
+          { type: "list", items: [
+            "天线与相控阵：工作带宽，单位Hz；实现增益，单位dBi；扫描范围，单位°；总效率，单位%；Active Voltage Standing Wave Ratio（Active VSWR，有源电压驻波比），量纲为1；扫描损耗、旁瓣电平、移相量化位数、单通道功耗和校准时间。",
+            "OAM与结构化场：目标模态纯度，单位%；跨模态串扰，单位dB；有限接收孔径捕获效率，单位%；偏轴、倾斜、频偏和互耦误差下的模态谱与重构误差。",
+            "高可靠抗干扰接收：输入J/S，单位dB；输出SINR，单位dB；BER；零陷深度，单位dB；目标增益损失，单位dB；训练快照数、CSI更新周期，单位s；幅相误差扫描后的10%分位数。",
+            "工程与成本：射频通道数、仿真网格与内存、一次参数扫描耗时、数据文件大小、算法乘加量、峰值功耗、物料成本和标定工时。证据注明解析、全波仿真、暗室测量、外场测量或标准评估。"
+          ] },
+          { type: "sources", items: [
+            { label: "ETH Zürich实验室：近场模型物理一致性评估与开源代码说明（2026-02-12）", url: "https://iip.ethz.ch/news-and-events/iip-news/2026/02/preprint-of-our-new-paper-on-physically-consistent-evaluation-of-commonly-used-near-field-models-now-available-on-arxiv.html" },
+            { label: "ITU-R官方：IMT-2030候选技术提交与评估入口", url: "https://www.itu.int/itu-r/en/itu-r-study-groups/rsg5/rwp5d/imt-2030/pages/submission-eval.aspx" },
+            { label: "3GPP官方：TR 38.901信道模型文档记录", url: "https://www.3gpp.org/dynareport/38901.htm" }
+          ] }
+        ],
+        tags: ["近7日无可靠热点", "模型可追溯", "误差预算", "可测指标"]
+      },
+      {
+        label: "CST × MATLAB",
+        title: "小任务：导出一圈复场并完成三道闭环检查",
+        tone: "accent",
+        blocks: [
+          { type: "heading", text: "目标与CST导出" },
+          { type: "text", text: "在已有均匀圆阵模型中只选一个中心频点f₀，f₀＝验证频率，单位Hz。在接收平面建立半径固定的一圈N个等角度采样点，导出同一极化分量的复电场实部与虚部；或导出N个接收端口的复电压。CSV列固定为index、phi_deg、real、imag，并在文件名记录频率、单位、坐标系和激励端口。" },
+          { type: "heading", text: "MATLAB最小可执行步骤" },
+          { type: "list", items: [
+            "用readmatrix读取CSV，构造x=real+1j*imag。先检查端口索引是否唯一且连续，再把phi_deg乘π/180转换为rad。不要对相位列直接做线性插值。",
+            "人工构造x_test(n)=exp(j·2·φₙ)，按本期公式求模态谱。主峰应落在ℓ＝+2；若落在−2，检查指数符号、方位角方向和编号顺序，而不是手动交换结果标签。",
+            "对CST数据计算端口能量Σ|xₙ|²和完整模态能量Σ|aℓ|²；相对差应接近浮点舍入误差。然后做完整模态往返重构，报告εrec。",
+            "只保留ℓ＝−2至+2重构，比较εrec与目标模态纯度；再把第一个端口循环移动一位，观察谱相位变化而功率谱保持。这个检查可区分方位起点改变与物理模态改变。"
+          ] },
+          { type: "formula", text: "x=M(:,3)+jM(:,4)；a=Fᴴx；ΔE=|‖x‖₂²−‖a‖₂²|/‖x‖₂²" },
+          { type: "heading", text: "通过标准与留档" },
+          { type: "text", text: "ΔE＝相对能量差，量纲为1；完整模态εrec和ΔE应接近数值精度。截断模态εrec可以较大，但必须与被删除模态功率一致。保存原始CSV、MATLAB脚本、频率、CST工程版本、端口映射表、单位和相位约定；输出一张模态功率谱和一张重构残差图。若闭环不通过，停止后续LCMV或BER比较。" },
+          { type: "sources", items: [
+            { label: "MathWorks官方：readmatrix数据导入语法与选项", url: "https://www.mathworks.com/help/matlab/ref/readmatrix.html" },
+            { label: "MathWorks官方：angle返回复数相位角", url: "https://www.mathworks.com/help/matlab/ref/angle.html" },
+            { label: "Dassault Systèmes官方：CST Studio Suite产品与工作流概览", url: "https://www.3ds.com/products/simulia/cst-studio-suite" }
+          ] }
+        ],
+        tags: ["CSV复数数据", "单模态自测", "Parseval检查", "往返重构"]
+      },
+      {
+        label: "论文精读",
+        title: "精读：用全波样本审计常用近场模型，而不是默认近似正确",
+        layout: "wide",
+        blocks: [
+          { type: "heading", text: "论文与研究问题" },
+          { type: "text", text: "Schwan、Stutz-Tirri等人的《Physically Consistent Evaluation of Commonly Used Near-Field Models》预印本于2026年2月公开。研究问题是：通信与感知中常用的近场模型，在预测真实电磁场时究竟准确到什么程度；怎样建立一个满足Maxwell's equations（麦克斯韦方程组）的离散参考模型来审计这些近似。直观上，作者不再让简化模型互相评分，而是用全波求解结果建立一把更接近物理的尺子。" },
+          { type: "heading", text: "方法" },
+          { type: "text", text: "团队从HFSS全波仿真提取预先定义空间坐标上的场响应，把端口激励到采样点场量的关系整理为离散线性模型；随后在三个场景比较常见近场模型：自由空间Uniform Linear Array（ULA，均匀线阵）聚焦、阵列与焦点之间存在障碍物、以及自由空间RIS。核心方法价值不是特定求解器，而是固定采样坐标、使用同一激励与观测量，再逐点比较复场。" },
+          { type: "formula", text: "e=Hw；e＝采样点复电场向量，单位V/m；H＝端口到空间采样点的复响应矩阵；w＝端口复激励向量" },
+          { type: "heading", text: "结果与证据强度" },
+          { type: "list", items: [
+            "实验室原始发布总结：常用模型对基础波束聚焦通常足够，但对旁瓣和RIS的频率相关行为预测不准。",
+            "发布方指出，RIS模型忽略镜面反射是误差来源之一。这提醒阵列与OAM研究：只拟合目标点峰值，可能掩盖旁瓣、跨模态泄漏和宽带失配。",
+            "这是全波仿真驱动的方法研究，不是OAM抗干扰实测。它支持的是模型审计流程，不能直接支持某种模态具有BER或J/S优势。"
+          ] },
+          { type: "heading", text: "局限与可复现价值" },
+          { type: "text", text: "全波参考仍受材料参数、边界条件、网格收敛和端口定义影响，因此“物理一致”不等于“自动等同实测”。对本课题最可复现的部分，是把CST中的逐端口嵌入场组成H，在MATLAB中对任意权值w重构场e，再与CST直接激励同一权值的结果逐点比较。若二者不一致，可按端口映射、共轭约定、归一化、坐标和网格顺序逐层定位。" },
+          { type: "sources", items: [
+            { label: "arXiv原文与版本记录：Physically Consistent Evaluation of Commonly Used Near-Field Models", url: "https://arxiv.org/abs/2602.10976" },
+            { label: "ETH Zürich原始发布：研究场景、主要发现与代码入口（2026-02-12）", url: "https://iip.ethz.ch/news-and-events/iip-news/2026/02/preprint-of-our-new-paper-on-physically-consistent-evaluation-of-commonly-used-near-field-models-now-available-on-arxiv.html" },
+            { label: "作者开源仓库：evaluation-of-near-field-models", url: "https://github.com/IIP-Group/evaluation-of-near-field-models" }
+          ] }
+        ],
+        tags: ["全波参考", "近场模型", "旁瓣误差", "可复现审计"]
+      },
+      {
+        label: "术语与思考题",
+        title: "把软件接口语言翻译为可检验的电磁量",
+        layout: "wide",
+        blocks: [
+          { type: "list", items: [
+            "CST Studio Suite（CST，三维全波电磁仿真软件）：求解天线、阵列和传播结构的电磁响应；本期提供端口复响应或空间复场数据。",
+            "MATLAB（Matrix Laboratory，矩阵实验室数值计算环境）：处理矩阵、信号与可视化；本期读取CST数据并完成模态投影和闭环校验。",
+            "Discrete Fourier Transform（DFT，离散傅里叶变换）：把等角度端口样本映射到离散方位模态；本期用于构造完整可逆的OAM模态坐标。",
+            "Orbital Angular Momentum（OAM，轨道角动量）：具有exp(jℓφ)方位相位结构的波场属性；本期用拓扑荷ℓ标记模态谱。",
+            "Embedded Element Pattern（EEP，嵌入阵元方向图）：其他端口按规定终端状态时，单端口激励得到的复方向图；本期用于保留互耦和平台散射后合成阵列场。",
+            "Channel State Information（CSI，信道状态信息）：接收器已知或估计的复信道响应；本期说明CST响应怎样成为接收算法的模型输入。",
+            "Parseval's theorem（帕塞瓦尔定理）：酉变换前后平方范数相等；本期用它检查端口域与完整模态域能量是否一致。",
+            "Condition number（κ，条件数）：衡量矩阵反演对误差敏感程度的无量纲指标；本期用于判断非均匀采样或模态截断会不会放大噪声。"
+          ] },
+          { type: "heading", text: "研究生层次思考题" },
+          { type: "text", text: "一个16端口均匀圆阵在CST中导出目标ℓ＝+1和一个外部干扰的复端口响应。MATLAB中完整DFT满足能量守恒，但目标主峰出现在ℓ＝−1；把端口顺序反转后，主峰回到+1，同时全端口LCMV的输出SINR不变。请解释：哪些变化只是坐标标签变化，哪些量必须保持不变？再设计三项检查，区分时间因子/指数符号错误、端口编号方向错误和真实接收几何镜像。最后说明为什么只看模态功率谱不能完成这一区分。" }
+        ],
+        tags: ["8个术语", "相位符号", "坐标不变量", "研究生思考题"]
+      }
+    ]
+  },
+  {
     issue: 8,
     date: "2026-08-06",
     dateLabel: "2026年8月6日 · ISSUE 08",
