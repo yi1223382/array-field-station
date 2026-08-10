@@ -1,5 +1,186 @@
 window.DAILY_BRIEFS = [
   {
+    issue: 10,
+    date: "2026-08-10",
+    dateLabel: "2026年8月10日 · ISSUE 10",
+    updatedAt: "2026-08-10 12:21",
+    title: "测量与误差：从幅相校准到OAM抗干扰性能边界",
+    summary: "围绕阵列测量中的系统误差、随机误差和模型失配，解释幅相误差怎样泄漏OAM模态、抬高自适应零陷，并用不确定度传播和蒙特卡洛扫描把单次结果改写成可信性能区间。近7日未发现足够可靠的新动态，本期采用IEEE、NIST与26 GHz相控阵实测论文推进测量主线。",
+    readingMinutes: 24,
+    modules: [
+      {
+        label: "今日结论",
+        title: "抗干扰实验的可信度取决于误差边界，而不只取决于最优曲线",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "list", items: [
+            "阵列测量中的幅度误差、相位误差、阵元位置误差和仪器漂移会共同改变复数阵列响应。直观上，它们把原本整齐相加的阵元变成一群节拍略有偏差的合唱者，使主瓣下降、旁瓣升高，并让Orbital Angular Momentum（OAM，轨道角动量）能量泄漏到邻近模态。",
+            "校准不是把某一条方向图修得好看，而是估计每个接收通道的复增益并建立可追溯参考。校准结果必须说明频率、方向、极化、温度、参考面和有效时间，否则不能默认跨工况复用。",
+            "零陷深度对相位误差尤其敏感。理想仿真中的极深零点通常由精确相消产生；小幅失配就会填平零陷。因此应报告误差分布下的输出Signal-to-Interference-plus-Noise Ratio（SINR，信干噪比）分位数，而不只报告零误差条件下的峰值。",
+            "2026年6月15日公开的26 GHz相控阵实测预印本表明，校准码本的条件数会控制测量噪声在求逆中的放大。论文用86个有效阵元验证：低条件数码本能以M＝N次测量取得与需要90次测量的参考方法接近的校准和扫描方向图。该结果支持校准方法，不直接证明OAM抗干扰增益。",
+            "截至北京时间2026年8月10日，近7日未发现足够可靠、直接关联OAM阵列测量、相控阵校准或抗干扰验证的新动态。本期不制造热点，采用2026年6月预印本、2025年NIST论文和现行IEEE测量规范作为证据。"
+          ] },
+          { type: "sources", items: [
+            { label: "arXiv原文：Neural Network-Enabled Codebook Design for Phased Array Calibration with Arbitrary Array Sizes（2026-06-15）", url: "https://arxiv.org/abs/2606.16132" },
+            { label: "NIST论文页：Two-Tier Vector-Network-Analyzer Calibrations for Uncertainties in Laboratory-Based Over-the-Air and Channel Measurements（2025-10-23）", url: "https://www.nist.gov/publications/two-tier-vector-network-analyzer-calibrations-uncertainties-laboratory-based-over-air" },
+            { label: "IEEE官方：IEEE 149-2021天线测量推荐规范", url: "https://standards.ieee.org/ieee/149/6667/" }
+          ] }
+        ],
+        tags: ["测量不确定度", "幅相校准", "模态泄漏", "鲁棒SINR"]
+      },
+      {
+        label: "核心理论",
+        title: "误差怎样从阵元复增益传播到模态谱与零陷",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "text", text: "直观解释：理想阵列依靠多个复数响应精确相加或相消。校准误差会旋转或缩放每个阵元的复数箭头。对主瓣而言，许多小误差通常表现为增益损失和旁瓣抬升；对深零陷而言，原本相消后的剩余量接近零，所以同样大小的误差会占据主导。OAM模态投影也是复数相加，因此错误会把单一模态摊到多个模态槽中。" },
+          { type: "heading", text: "条件与变量：把真实响应写成理想响应乘以通道误差" },
+          { type: "text", text: "设N＝阵元或接收端口数，量纲为1；a∈ℂᴺ＝理想导向向量；gₙ＝第n通道的幅度比例，量纲为1；δφₙ＝第n通道的相位误差，单位rad；δrₙ＝第n阵元的位置误差向量，单位m；k＝2π/λ＝波数，单位rad/m；λ＝波长，单位m；u＝传播方向单位向量。物理图像是幅度误差改变箭头长度，相位与位置误差改变箭头方向。" },
+          { type: "formula", text: "ãₙ=gₙ·aₙ·exp[j(δφₙ+k·u·δrₙ)]" },
+          { type: "text", text: "对小误差可用exp(jε)≈1+jε做一阶近似。若δgₙ＝gₙ−1，则阵列响应误差δaₙ主要由幅度项δgₙ和总相位项δφₙ+k·u·δrₙ组成。这个近似适合解释误差传播，不适合替代大误差下的完整复指数计算。" },
+          { type: "formula", text: "δaₙ≈aₙ[δgₙ+j(δφₙ+k·u·δrₙ)]" },
+          { type: "heading", text: "公式：从端口误差到OAM模态泄漏" },
+          { type: "text", text: "令F＝单位化的Discrete Fourier Transform（DFT，离散傅里叶变换）模态矩阵；x＝理想端口复响应；D＝diag(gₙexp(jδφₙ))＝通道误差矩阵；b＝FᴴDx＝测得的模态系数向量。上标H表示共轭转置。若D不是单位矩阵，它通常不能与F保持理想正交关系，于是目标模态外出现泄漏。" },
+          { type: "formula", text: "b=FᴴDx；ηℓ=|bℓ|²/Σₘ|bₘ|²；Lleak=10log₁₀[(Σₘ≠ℓ|bₘ|²)/|bℓ|²]" },
+          { type: "text", text: "ηℓ＝目标模态纯度，量纲为1；Lleak＝相对模态泄漏，单位dB。ηℓ越高、Lleak越负，目标模态越集中。但它们只描述接收孔径上的模态分布，不能单独等同于低Bit Error Rate（BER，误码率）。" },
+          { type: "heading", text: "公式：为什么零陷需要误差统计" },
+          { type: "text", text: "设w＝接收权值向量；aJ＝干扰导向向量；理想设计满足wᴴaJ＝0。实际残余干扰复幅度近似为wᴴδaJ，功率与其模平方成正比。若只知道每通道误差上限，可做最坏情形扫描；若有重复校准数据，可估计误差分布并做Monte Carlo（蒙特卡洛）随机抽样。" },
+          { type: "formula", text: "PJ,res∝|wᴴδaJ|²；SINRout=Ps|wᴴas|²/[PJ|wᴴãJ|²+wᴴRnw]" },
+          { type: "text", text: "Ps与PJ分别是目标和干扰输入功率，单位W；as与ãJ分别是目标和实际干扰响应；Rn＝噪声协方差矩阵，单位W。与课题的关系是：OAM模态选择和自适应波束形成都依赖同一组复响应，误差应在同一个端口域进入模型，再观察模态纯度、零陷、输出SINR和BER怎样共同变化。" }
+        ],
+        tags: ["复增益误差", "位置误差", "模态泄漏", "零陷填充"]
+      },
+      {
+        label: "课题连接",
+        title: "把校准有效性、OAM物理结论和抗干扰主张分层验证",
+        tone: "accent",
+        blocks: [
+          { type: "heading", text: "合理结论" },
+          { type: "list", items: [
+            "幅相误差会破坏均匀圆阵的循环对称性，因此理想DFT模态不再完全解耦。用实测逐端口复响应构造模态耦合矩阵，可以量化目标模态向邻模态的泄漏。",
+            "校准矩阵的条件数越大，测量噪声在求逆时越容易被放大。增加测量次数、改进码本正交性或采用正则化可降低方差，但会增加时间、计算或偏差。",
+            "同一组误差样本应同时送入固定OAM模态接收、截断模态接收和全端口自适应接收。这样才能判断差异来自算法结构，而不是三种方法使用了不同的误差假设。"
+          ] },
+          { type: "heading", text: "适用条件" },
+          { type: "text", text: "一阶误差模型要求幅度和相位偏差较小，阵列在校准与测试之间近似线性且时不变。若功率放大器进入非线性区、移相器误差随状态变化、温度显著漂移或互耦随终端阻抗改变，应使用按频率、功率、波束状态和时间索引的实测误差，而不是一个固定复增益。" },
+          { type: "formula", text: "Hmeas(f,t,T,q)=Htrue(f)⊙G(f,t,T,q)+E(f,t,T,q)" },
+          { type: "text", text: "f＝频率，单位Hz；t＝时间，单位s；T＝温度，单位K或℃；q＝移相与衰减器状态；⊙表示逐元素相乘；E＝未被乘性模型解释的残差。直观上，误差不是一个永久贴在阵元上的常数，而可能随工作状态移动。" },
+          { type: "heading", text: "仍有争议或待验证" },
+          { type: "list", items: [
+            "“OAM天然抗干扰”不是由模态正交性自动推出。偏轴接收、有限孔径、多径和幅相误差都会引入跨模态耦合，必须在相同孔径、射频通道数和输入Jam-to-Signal ratio（J/S，干信比）下比较输出SINR与BER。",
+            "一次暗室校准不能证明长期鲁棒性。应测量校准后随时间、温度和重新上电的漂移，并给出95%区间或最坏值。",
+            "把所有误差都假设成独立同分布高斯变量可能低估风险。馈电网络、时钟或机械安装会制造通道间相关误差；相关结构应由重复测量估计，或以保守场景单独扫描。"
+          ] },
+          { type: "text", text: "本期只讨论接收端、防御性和学术性抗干扰评估，不提供对他人通信实施干扰的设备参数或部署指导。" }
+        ],
+        tags: ["证据分层", "时变误差", "公平对比", "相关误差"]
+      },
+      {
+        label: "行业需求",
+        title: "近7日热点不足：工程验收正在把“校准过”改写为可量化不确定度",
+        layout: "wide",
+        priority: "证据分级",
+        blocks: [
+          { type: "text", text: "截至2026年8月10日，近7日未发现足够可靠、可由一手来源核验，且直接关联OAM阵列测量、相控阵校准或高可靠抗干扰通信的新动态。以下使用发布日期更早的标准组织、国家计量机构和原始论文资料，不称为本周热点。" },
+          { type: "heading", text: "A｜天线测量需要设施、仪器与测距共同受控（强证据：IEEE现行标准）" },
+          { type: "text", text: "IEEE 149-2021《IEEE Recommended Practice for Antenna Measurements》（IEEE天线测量推荐规范）覆盖天线发射与接收特性、方向图测量、测试场设计、仪器要求和场地评估。对阵列研发的翻译是：增益、扫描范围和旁瓣不能脱离测试距离、静区、极化对准、动态范围与不确定度说明。" },
+          { type: "heading", text: "B｜OTA链路的电缆与校准参考面会改变不确定度（强证据：NIST同行评审论文，2025-10-23）" },
+          { type: "text", text: "National Institute of Standards and Technology（NIST，美国国家标准与技术研究院）研究了实验室Over-the-Air（OTA，空中接口）和信道测量中的两级Vector Network Analyzer（VNA，矢量网络分析仪）校准，量化长电缆与不同校准位置之间的便利性—不确定度权衡。工程需求因此应写成：给出校准参考面、线缆稳定性、复数S参数重复性，以及功率时延谱和到达角结果的合成不确定度。" },
+          { type: "heading", text: "C｜校准效率与可靠性可由测量次数和条件数表达（中等证据：预印本加26 GHz实测，2026-06-15）" },
+          { type: "text", text: "Chen等人的预印本把M＝校准测量次数、N＝有效阵元数和κ(A)＝码本矩阵条件数放进同一设计问题。对86阵元实验，低条件数码本以M＝86完成校准；论文报告它与M＝90参考法的平均绝对相位和幅度差分别为2.42°与0.42 dB。证据支持特定测试平台上的校准效率，不应外推为所有阵列和环境的普遍优势。" },
+          { type: "heading", text: "把笼统岗位或技术需求翻译为可测指标" },
+          { type: "list", items: [
+            "相控阵与基站天线：带宽，单位Hz；实现增益，单位dBi；扫描范围，单位°；扫描损耗与旁瓣电平，单位dB；Active Voltage Standing Wave Ratio（Active VSWR，有源电压驻波比），量纲为1；幅相校准残差、校准耗时、温漂和单通道功耗。",
+            "OAM与结构化电磁场：目标模态纯度，单位%；跨模态串扰，单位dB；接收孔径捕获效率，单位%；偏轴，单位m；倾角，单位°；重复装调后的模态谱置信区间。",
+            "高可靠抗干扰接收：输入J/S与输出SINR，单位dB；BER；零陷深度，单位dB；目标增益损失，单位dB；Channel State Information（CSI，信道状态信息）更新周期，单位s；在幅相、位置和协方差估计误差下的10%分位数。",
+            "测试与成本：静区幅相起伏、校准参考面、仪器动态范围、重复次数、测量总时长、数据文件大小、暗室与转台工时、计算量、峰值功耗和校准有效期。每个结果注明解析、全波仿真、暗室实测或外场实测。"
+          ] },
+          { type: "sources", items: [
+            { label: "IEEE官方标准页：IEEE 149-2021", url: "https://standards.ieee.org/ieee/149/6667/" },
+            { label: "NIST原始论文页：两级VNA校准与OTA测量不确定度", url: "https://www.nist.gov/publications/two-tier-vector-network-analyzer-calibrations-uncertainties-laboratory-based-over-air" },
+            { label: "arXiv原文：任意阵元数相控阵校准码本设计", url: "https://arxiv.org/abs/2606.16132" }
+          ] }
+        ],
+        tags: ["近7日无可靠热点", "IEEE 149", "OTA不确定度", "验收指标"]
+      },
+      {
+        label: "CST × MATLAB",
+        title: "小任务：为OAM接收阵列建立幅相误差蒙特卡洛包络",
+        tone: "accent",
+        blocks: [
+          { type: "heading", text: "目标与输入" },
+          { type: "text", text: "沿用昨天从CST导出的N端口目标响应hs和干扰响应hJ。两者都是同一频率、参考面和端口顺序下的复数列向量。今天不重跑大规模全波参数扫描，而是在MATLAB中建立可重复的误差层，回答“校准残差达到什么水平时，模态纯度和零陷开始失效”。" },
+          { type: "heading", text: "MATLAB最小可执行步骤" },
+          { type: "list", items: [
+            "设置随机种子rng(10)。选取幅度误差标准差σA＝0.25 dB、相位误差标准差σφ＝2°作为演示起点；它们不是设备事实，最终应替换为重复校准得到的实测统计量。",
+            "生成K＝1000组独立误差：eA=10.^((σA*randn(N,K))/20)，eP=exp(1j*deg2rad(σφ)*randn(N,K))。令每组目标与干扰响应都乘以同一通道误差eA.*eP，以模拟接收链校准残差。",
+            "使用零误差模型设计一次固定接收权值w，再把它施加到1000组扰动响应。逐组计算目标增益、干扰残余、输出SINR、OAM模态纯度和零陷深度。不要在每组扰动后重新优化w，否则会把未知误差当成已知信息。",
+            "分别把σφ扫为0°、1°、2°、5°，把σA扫为0、0.1、0.25、0.5 dB。每个网格点报告中位数、10%分位数和最坏值，画出输出SINR的误差包络。",
+            "增加一个相关误差场景：所有通道共享1°公共相位漂移，并叠加独立残差。公共相位通常不改变单波束功率，却可能影响与另一独立参考链的相干合成；用这个对照检查误差模型是否符合物理。"
+          ] },
+          { type: "formula", text: "G=eA⊙eP；h̃s=G⊙hs；h̃J=G⊙hJ；Dnull=20log₁₀(|wᴴhJ|/|wᴴh̃J|)" },
+          { type: "text", text: "σA＝通道幅度误差标准差，单位dB；σφ＝相位误差标准差，单位°；K＝蒙特卡洛次数，量纲为1；Dnull＝误差引起的零陷变化，单位dB。通过标准不是得到某个预设漂亮数字，而是代码可复现、零误差点回到基线、误差增加时性能趋势合理，并明确区分演示参数与实测参数。" },
+          { type: "heading", text: "下一步与CST闭环" },
+          { type: "text", text: "若MATLAB扫描发现相位误差是主导项，再在CST中只选3至5个代表性误差状态，用端口相位偏置或实际馈电网络模型重算，检查乘性误差近似是否仍成立。保存随机种子、原始复响应、权值、误差表和分位数结果，避免只保存图片。" },
+          { type: "sources", items: [
+            { label: "MathWorks官方：rng控制随机数流以实现可复现", url: "https://www.mathworks.com/help/matlab/ref/rng.html" },
+            { label: "MathWorks官方：prctile计算样本百分位数", url: "https://www.mathworks.com/help/matlab/ref/prctile.html" },
+            { label: "NIST：Channel Sounder Measurement Verification and Uncertainty", url: "https://www.nist.gov/publications/channel-sounder-measurement-verification-and-uncertainty" }
+          ] }
+        ],
+        tags: ["蒙特卡洛", "幅相残差", "误差包络", "可复现随机种子"]
+      },
+      {
+        label: "论文精读",
+        title: "精读：用低条件数码本减少相控阵校准的噪声放大",
+        layout: "wide",
+        blocks: [
+          { type: "heading", text: "论文与研究问题" },
+          { type: "text", text: "Chen、Sun等人的《Neural Network-Enabled Codebook Design for Phased Array Calibration with Arbitrary Array Sizes》于2026年6月15日提交至arXiv。研究问题是：在所有阵元同时开启的OTA校准中，怎样为任意阵元数和有限相位量化位数生成低条件数码本，并把测量次数压到理论最小值M＝N。直观上，码本规定每次测量时各阵元怎样换相；好的码本让不同阵元的贡献容易分离。" },
+          { type: "heading", text: "方法与公式" },
+          { type: "text", text: "设A∈ℂᴹˣᴺ＝校准码本矩阵；x∈ℂᴺ＝未知阵元复校准系数；y∈ℂᴹ＝测量向量；n∈ℂᴹ＝测量噪声。模型为y＝Ax+n。当M＝N且A可逆时，x̂＝A⁻¹y；A的条件数κ(A)越大，噪声越可能在求逆时被放大。" },
+          { type: "formula", text: "y=Ax+n；x̂−x=A⁻¹n；‖δx‖₂/‖x‖₂≤κ(A)·‖δy‖₂/‖y‖₂" },
+          { type: "text", text: "作者用共享神经网络根据矩阵行列坐标、阵元数N和相位量化位数生成初始相位，再通过量化、随机重启和局部优化降低条件数。训练损失同时惩罚逆矩阵范数和偏离正交矩阵的程度。神经网络在这里是离线码本生成器；部署时存储预计算码本，不需要实时推理。" },
+          { type: "heading", text: "结果与证据强度" },
+          { type: "list", items: [
+            "数值结果覆盖N＝2至256、4至6 bit相位量化。论文报告所生成码本的平均条件数分别为1.41、1.17和1.08；量化位数越高，越接近理想值1。",
+            "实测在26 GHz Compact Antenna Test Range（CATR，紧缩场天线测试场）进行，设备为16×16 Antenna-in-Package（AiP，封装天线）阵列，选取中央86个有效阵元。静区为75 cm×75 cm，论文给出的幅相起伏为±0.4 dB与±4°。",
+            "对N＝86，参考码本在M＝86时条件数为21.12，扩展到M＝90后为3.52；所提6 bit码本在M＝86时为1.08。所提方法与M＝90参考法的校准结果平均绝对差为2.42°和0.42 dB，并得到接近的水平、垂直扫描方向图。"
+          ] },
+          { type: "heading", text: "局限与可复现价值" },
+          { type: "text", text: "这是五页预印本，实验集中于一套26 GHz AiP平台和一个86阵元子阵；文中没有给出跨温度、跨频带、长期漂移、OAM模态或抗干扰BER结果。论文把码本性能主要归因于阵元数和相位量化，但真实系统还可能存在状态相关幅相误差与非线性。对本课题最可复现的部分不是神经网络本身，而是先构造不同条件数的矩阵A，向y加入已知复噪声，验证κ(A)与校准误差分布、模态泄漏和零陷退化之间的关系。" },
+          { type: "sources", items: [
+            { label: "arXiv摘要、全文与提交记录：arXiv:2606.16132", url: "https://arxiv.org/abs/2606.16132" },
+            { label: "arXiv PDF原文：Neural Network-Enabled Codebook Design for Phased Array Calibration with Arbitrary Array Sizes", url: "https://arxiv.org/pdf/2606.16132" }
+          ] }
+        ],
+        tags: ["OTA校准", "码本条件数", "26 GHz实测", "噪声放大"]
+      },
+      {
+        label: "术语与思考题",
+        title: "把测量误差语言翻译为可复现的系统指标",
+        layout: "wide",
+        blocks: [
+          { type: "list", items: [
+            "Over-the-Air（OTA，空中接口）：不直接连接每个射频端口，而通过辐射链路测量整机；本期用于描述封装相控阵的校准方式。",
+            "Vector Network Analyzer（VNA，矢量网络分析仪）：测量散射参数幅度和相位的仪器；本期获取每个校准码本状态的复数传输系数。",
+            "Compact Antenna Test Range（CATR，紧缩场天线测试场）：用反射面在有限距离形成近似平面波静区；本期为26 GHz阵列提供受控实测环境。",
+            "Uncertainty budget（不确定度预算）：列出各误差来源、分布、灵敏度与合成贡献的量化表；本期用于把“测得多少”与“可信到什么范围”同时报告。",
+            "Condition number（κ，条件数）：衡量线性求逆对扰动敏感程度的无量纲指标；本期解释校准码本怎样放大测量噪声。",
+            "Monte Carlo method（蒙特卡洛方法）：按指定概率模型反复随机抽样并统计输出分布；本期生成幅相误差下的SINR、模态纯度与零陷包络。",
+            "Orbital Angular Momentum（OAM，轨道角动量）：以exp(jℓφ)方位相位结构表征的波场属性；本期观察校准误差导致的跨模态泄漏。",
+            "Signal-to-Interference-plus-Noise Ratio（SINR，信干噪比）：目标输出功率与干扰加噪声输出功率之比，通常以dB表示；本期作为抗干扰接收的主要系统指标。"
+          ] },
+          { type: "heading", text: "研究生层次思考题" },
+          { type: "text", text: "一个16端口OAM接收圆阵在零误差模型下可对单个干扰形成−60 dB零陷。重复校准显示：每通道独立相位残差标准差为2°，另有全部通道共享的3°公共相位漂移；幅度误差可忽略。请先判断公共相位与独立相位误差分别会怎样影响单波束功率、OAM模态纯度和相对另一参考链的相干合成。再设计一个不少于1000次的蒙特卡洛实验，规定哪些量在每次试验中固定、哪些随机，报告输出SINR的中位数与10%分位数。最后说明为什么用零误差模型为每个随机样本重新计算最优权值，会高估实际系统的鲁棒性。" }
+        ],
+        tags: ["8个术语", "公共相位", "误差统计", "鲁棒性思考题"]
+      }
+    ]
+  },
+  {
     issue: 9,
     date: "2026-08-09",
     dateLabel: "2026年8月9日 · ISSUE 09",
