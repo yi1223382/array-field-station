@@ -1,5 +1,173 @@
 window.DAILY_BRIEFS = [
   {
+    issue: 11,
+    date: "2026-08-13",
+    dateLabel: "2026年8月13日 · ISSUE 11",
+    updatedAt: "2026-08-13 10:00",
+    title: "宽带波束斜视：固定相移为何让OAM模态随频率漂移",
+    summary: "从相位与时延的区别出发，解释宽带相控阵的波束斜视怎样扩展为均匀圆阵的方向、焦点与OAM模态共同失配；给出相移器和真时延的可测对照，并把结论落到宽带OAM抗干扰链路的模态串扰、输出SINR与BER。近7日未发现足够可靠的新动态，本期采用ITU-R官方进展和2026年1024阵元实测论文推进理论主线。",
+    readingMinutes: 24,
+    modules: [
+      {
+        label: "今日结论",
+        title: "宽带阵列不能把中心频率的一组相位直接复制到所有频率",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "list", items: [
+            "Phase shifter（PS，相移器）给各阵元施加近似固定的相位差；True Time Delay（TTD，真时延）给各阵元施加固定的传播时间差。直观上，相移器只在一个音高上把合唱对齐，真时延则把每个人的入场时刻对齐，所以后者更适合宽带信号。",
+            "Beam squint（波束斜视）是固定相移权值在偏离设计频率后指向发生变化。对均匀圆阵与Orbital Angular Momentum（OAM，轨道角动量）接收而言，问题不只是一条主瓣转动：有限孔径上的相位、幅度和模态投影也会随子载波改变。",
+            "2026年4月17日发表的1024阵元Ku波段实测论文报告：在60°扫描和800 MHz带宽内，子阵级TTD与阵元级PS混合架构把最大指向误差由±3.5°降至±1°；发送600 MHz、64 Quadrature Amplitude Modulation（64QAM，64阶正交幅度调制）信号时，Error Vector Magnitude（EVM，误差矢量幅度）由大于7%改善到小于2%。这是宽带相控阵证据，不是OAM抗干扰实证。",
+            "OAM课题中应逐频点报告模态串扰矩阵、目标模态纯度、输出Signal-to-Interference-plus-Noise Ratio（SINR，信干噪比）和Bit Error Rate（BER，误码率），不能只展示中心频率的螺旋相位图。",
+            "截至北京时间2026年8月13日，近7日未发现足够可靠、直接关联宽带OAM阵列或相控阵抗干扰的新动态。本期不制造热点，采用2026年同行评审实测论文、ITU-R截至2026年7月的官方进展和常青理论资料。"
+          ] },
+          { type: "sources", items: [
+            { label: "Science China Information Sciences：TTD-PS混合宽带相控阵实测（2026-04-17）", url: "https://doi.org/10.1007/s11432-025-4884-2" },
+            { label: "ITU-R：IMT-2030提交与评估进程（状态截至2026年7月）", url: "https://www.itu.int/en/ITU-R/study-groups/rsg5/rwp5d/imt-2030/Pages/submission-eval.aspx" }
+          ] }
+        ],
+        tags: ["宽带阵列", "波束斜视", "真时延", "模态失配"]
+      },
+      {
+        label: "核心理论",
+        title: "从固定相位到固定时延：斜视怎样进入OAM模态谱",
+        layout: "wide",
+        tone: "accent",
+        blocks: [
+          { type: "text", text: "直观解释：阵列把每个阵元的复电场看成一支旋转箭头。要让来自目标方向的箭头同向相加，阵元补偿必须抵消真实传播时差。频率改变时，同一传播时差对应的相位角会按频率成比例改变；固定相移器却不跟着改变，因此箭头逐渐散开，主瓣、焦点或模态都会偏离设计状态。" },
+          { type: "heading", text: "条件与变量：先看一维阵列的方向漂移" },
+          { type: "text", text: "设f₀＝设计中心频率，单位Hz；f＝实际频率，单位Hz；d＝相邻阵元间距，单位m；c＝真空光速，约3×10⁸ m/s；θ₀＝设计扫描角，单位rad；θ(f)＝频率f处的实际主瓣角，单位rad；n＝阵元序号，量纲为1。采用阵列法线为0°的角度约定。物理图像是路径差d sinθ产生传播时差。" },
+          { type: "formula", text: "τₙ=n·d·sinθ₀/c；　φₙ(f)=−2πfτₙ" },
+          { type: "text", text: "若硬件只保存中心频率相位φₙ(f₀)，在频率f处相长条件给出下式。它说明相对带宽越大、扫描角越大，方向漂移通常越明显；当右端绝对值超过1时，该理想主瓣条件甚至没有实数角度解。" },
+          { type: "formula", text: "sinθ(f)=(f₀/f)sinθ₀；　Δθ(f)=θ(f)−θ₀" },
+          { type: "heading", text: "圆阵与OAM：角向相位标签不等于完整宽带补偿" },
+          { type: "text", text: "设N＝圆阵阵元数，量纲为1；a＝圆阵半径，单位m；ϕₙ＝2πn/N＝第n阵元方位角，单位rad；ℓ＝OAM拓扑荷，量纲为1；u₀＝目标传播方向单位向量；rₙ＝第n阵元位置向量，单位m；k(f)＝2πf/c＝波数，单位rad/m。仅施加exp(jℓϕₙ)能形成角向相位绕转，但若还要把能量指向非轴向目标，必须补偿随频率变化的几何传播相位。" },
+          { type: "formula", text: "wₙ,PS=exp[jℓϕₙ]·exp[−jk(f₀)u₀·rₙ]" },
+          { type: "formula", text: "wₙ,TTD(f)=exp[jℓϕₙ]·exp[−j2πfτₙ]，　τₙ=u₀·rₙ/c" },
+          { type: "text", text: "第一式在f₀精确匹配；第二式的几何项随f变化，因此保持方向补偿。需要注意，exp(jℓϕₙ)本身若由固定相移实现，离散端口标签仍保持不变，但实际传播、阵元方向图、互耦和接收孔径投影都会随频率变化，所以接收模态纯度并不自动恒定。" },
+          { type: "heading", text: "公式：用逐频模态串扰而不是单点纯度评价" },
+          { type: "text", text: "令H(f)＝频率f处从发射端口到接收端口的复信道矩阵；F＝单位化Discrete Fourier Transform（DFT，离散傅里叶变换）矩阵；C(f)＝模态域信道矩阵。上标H表示共轭转置。C(f)的非对角元素表示不同离散角向模态之间的耦合。" },
+          { type: "formula", text: "C(f)=FᴴH(f)F；　XTℓ(f)=10log₁₀[Σₘ≠ℓ|Cₘℓ(f)|²/|Cℓℓ(f)|²]" },
+          { type: "text", text: "XTℓ＝第ℓ模态的相对串扰，单位dB；数值越负，带外泄漏越小。与课题的关系是：固定相移、逐频数字权值和TTD应在相同孔径、功率和信道条件下比较，并同时观察带内最差XTℓ、输出SINR和BER。" }
+        ],
+        tags: ["固定相移", "传播时延", "逐频信道", "模态串扰"]
+      },
+      {
+        label: "课题连接",
+        title: "把宽带OAM抗干扰主张拆成可成立、有限制与待验证三层",
+        tone: "accent",
+        blocks: [
+          { type: "heading", text: "合理结论" },
+          { type: "list", items: [
+            "固定模拟相移权值会使阵列响应随频率失配。若期望信号与干扰依靠空间或模态差异分离，失配会改变两者在各子载波上的投影，并可能抬高带边残余干扰。",
+            "数字基带可对每个Orthogonal Frequency Division Multiplexing（OFDM，正交频分复用）子载波使用不同权值；直观上，它把宽带问题拆成许多窄带问题，但需要足够的射频通道和逐频Channel State Information（CSI，信道状态信息）。",
+            "TTD能校正由几何路径差引起的一阶线性相位，但不能自动修复阵元色散、频变互耦、功率放大器非线性、接收偏轴和多径。"
+          ] },
+          { type: "heading", text: "适用条件" },
+          { type: "text", text: "简单斜视公式假设远场平面波、阵元近似相同、窄带阵元方向图和理想连续相移。近场大孔径系统还会出现焦距随频率漂移；宽带OAM系统则需直接使用H(f)或实测复场，不能只把一维扫描公式套到圆阵。" },
+          { type: "formula", text: "SINRout(f)=Ps(f)|wᴴ(f)hs(f)|²/[wᴴ(f)(RJ(f)+Rn(f))w(f)]" },
+          { type: "text", text: "Ps(f)＝期望信号功率谱，单位W/Hz；hs(f)＝期望信号导向向量；RJ(f)＝干扰协方差矩阵，单位W/Hz；Rn(f)＝噪声协方差矩阵，单位W/Hz；w(f)＝接收权值。物理图像是每个频率都有自己的一组空间箭头和相消条件。" },
+          { type: "heading", text: "仍有争议或待验证" },
+          { type: "list", items: [
+            "“拓扑荷在宽带内不变”不能推出“通信模态在宽带内正交”。前者描述理想相位绕转标签，后者还取决于有限接收孔径、信道和频变硬件。",
+            "“TTD后OAM天然抗干扰”仍无普遍依据。需要在相同输入Jam-to-Signal ratio（J/S，干信比）、孔径、射频通道数和总功耗下，与逐子载波常规波束形成比较。",
+            "平均带宽指标可能掩盖带边失效。至少应同时报告带内中位数、5%分位数和最差值，并说明CSI误差与更新速率。"
+          ] },
+          { type: "text", text: "本期仅从公开、防御性和学术性角度讨论接收端鲁棒性，不提供干扰他人通信的设备参数或部署指导。" }
+        ],
+        tags: ["OFDM逐频权值", "频变信道", "证据边界", "公平对照"]
+      },
+      {
+        label: "行业需求",
+        title: "热点不足时，更应把“宽带扫描”翻译成联合验收指标",
+        layout: "wide",
+        tone: "industry",
+        priority: "证据分级",
+        blocks: [
+          { type: "heading", text: "A｜1024阵元实测把宽带、扫描与调制质量连到一起（强证据：同行评审实测，2026-04-17）" },
+          { type: "text", text: "Jiang等构建了由四块256阵元面板拼接的1024阵元Ku波段阵列，在子阵级使用四颗TTD芯片、阵元级使用PS。60°扫描、800 MHz带宽下，最大指向误差从纯PS架构的±3.5°降至混合架构的±1°；600 MHz、64QAM传输中，EVM由大于7%改善至小于2%。证据直接支持混合TTD-PS缓解波束斜视，但没有测试OAM模态或抗干扰性能。" },
+          { type: "list", items: [
+            "相控阵验收：工作带宽、扫描范围、带内指向误差、扫描损耗、旁瓣电平、群时延纹波、EVM、每通道功耗和校准时间。",
+            "OAM/结构化场验收：逐频模态串扰矩阵、带内最差模态纯度、接收孔径占比、偏轴容差，以及拓扑荷与频率映射是否稳定。",
+            "高可靠接收验收：给定J/S和干扰模型后，报告输出SINR、BER或Block Error Rate（BLER，块误码率）、零陷深度、期望信号增益损失及带边最差值。"
+          ] },
+          { type: "heading", text: "B｜IMT-2030评估从口号转向可复现实验环境（强证据：ITU-R官方状态）" },
+          { type: "text", text: "ITU-R Working Party 5D（WP 5D，国际电联无线电通信部门第5D工作组）页面显示：截至2026年7月，独立评估组申请仍在审查；2026年6月完成的评估指南草案已纳入近场、空间非平稳和Integrated Sensing and Communication（ISAC，通信感知一体化）信道模型，并拟于2026年12月提交上级研究组审批。它目前是草案，不应写成已生效标准。" },
+          { type: "text", text: "对课题的推论：大孔径、宽带和结构化场研究若要对接未来评估体系，应保存可复现的阵列几何、逐频复响应、噪声与干扰假设，而不是只交一张最佳频点方向图。证据强度属于从官方评估方向得出的工程推论，并非ITU-R对OAM路线的背书。" },
+          { type: "sources", items: [
+            { label: "同行评审论文：Design of a wideband phased array using TTD-PS hybrid beamforming（2026-04-17）", url: "https://doi.org/10.1007/s11432-025-4884-2" },
+            { label: "ITU-R：IMT-2030评估指南草案官方说明（2026-06）", url: "https://www.itu.int/en/ITU-R/study-groups/rsg5/rwp5d/imt-2030/pages/default.aspx" },
+            { label: "ITU-R：首版IMT-2030提交与独立评估组状态（截至2026-07）", url: "https://www.itu.int/en/ITU-R/study-groups/rsg5/rwp5d/imt-2030/Pages/submission-eval.aspx" }
+          ] }
+        ],
+        tags: ["1024阵元", "Ku波段", "EVM", "IMT-2030评估"]
+      },
+      {
+        label: "CST × MATLAB",
+        title: "最小任务：比较固定相移与逐频真时延的模态稳定性",
+        blocks: [
+          { type: "text", text: "目标是在60—90分钟内得到三张可核查曲线：主瓣角随频率、目标模态纯度随频率、模态串扰随频率。先用理想端口完成闭环，再决定是否加入真实贴片。" },
+          { type: "list", items: [
+            "CST：建立N＝8的Uniform Circular Array（UCA，均匀圆阵），中心频率f₀＝10 GHz，半径a＝0.75λ₀；使用相同离散端口或理想辐射源，扫频9—11 GHz。λ₀＝c/f₀为中心频率波长，单位m。",
+            "工况PS：选ℓ＝1、目标方向θ₀＝30°、方位角0°；按中心频率计算一组固定复激励，并在全部频点保持相位不变。",
+            "工况TTD：MATLAB按每个频点计算几何相位exp[−j2πfτₙ]，再乘OAM项exp(jℓϕₙ)；若CST不能在单次任务中直接设置频变激励，就逐频导入复权值或用导出的嵌入方向图在线性叠加。",
+            "导出：每个频点保存各端口Embedded Element Pattern（嵌入阵元方向图）或固定球面/平面采样上的复数电场，必须包含实部与虚部，并记录坐标、极化分量和相位符号约定。",
+            "MATLAB：对接收圆周上的复场做角向DFT，计算η₁(f)＝目标ℓ＝1模态纯度、XT₁(f)和主能量方向；分别画PS与TTD曲线。",
+            "验收：确认f₀处两工况近似一致；比较9 GHz和11 GHz的|Δθ|、η₁及XT₁。若TTD仍明显漂移，依次检查阵元方向图色散、互耦、采样圆位置、全局相位和频变幅度。"
+          ] },
+          { type: "formula", text: "η₁(f)=|b₁(f)|²/Σₘ|bₘ(f)|²；　bₘ(f)=Nₛ⁻¹Σq E(f,ϕq)e^(−jmϕq)" },
+          { type: "text", text: "Nₛ＝接收圆周采样点数，量纲为1；E(f,ϕq)＝第q个方位采样点的复场，单位V/m；bₘ(f)＝第m个角向模态系数，单位V/m。保存一个CSV表，列为frequency_GHz、scheme、beam_angle_deg、eta_l1、XT_l1_dB，作为以后加入偏轴、互耦和干扰的基线。" }
+        ],
+        tags: ["9—11 GHz", "逐频激励", "嵌入方向图", "CSV基线"]
+      },
+      {
+        label: "论文精读",
+        title: "TTD-PS混合架构能否把大孔径宽带阵列做成可测系统",
+        tone: "accent",
+        blocks: [
+          { type: "text", text: "本期精读Jiang等发表于Science China Information Sciences的2026年论文。它适合作为课题的工程参照，因为作者没有停留在算法曲线，而是把子阵真时延、阵元相移、1024阵元硬件和宽带调制测量放在同一条证据链上。" },
+          { type: "heading", text: "研究问题" },
+          { type: "text", text: "纯相移架构在大扫描角和宽带条件下产生波束斜视；每阵元完整TTD又会带来损耗、规模、功耗与控制复杂度。论文追问：能否用子阵级TTD承担粗略时延补偿，再用阵元级PS完成空间扫描，从而在硬件成本与带内稳定性之间折中？" },
+          { type: "heading", text: "方法与结果" },
+          { type: "text", text: "作者拼接四块256阵元Ku波段面板，并配置四颗TTD芯片；比较纯PS和TTD-PS混合架构。在60°扫描、800 MHz带宽内，最大指向误差由±3.5°降到±1°。在600 MHz、64QAM通信实验中，EVM从大于7%改善到小于2%。EVM衡量接收星座点相对理想位置的均方根偏差；越小通常表示幅相失真越轻。" },
+          { type: "heading", text: "局限" },
+          { type: "list", items: [
+            "论文验证的是特定Ku波段面板、带宽和扫描角；不能直接外推到任意频段、近场焦点或圆阵。",
+            "公开摘要没有给出OAM模态串扰、J/S、输出SINR或BER，因此不能把EVM改善解释为OAM抗干扰增益。",
+            "子阵级TTD仍存在子阵内残余斜视；延时量化、群时延纹波、插入损耗、幅度不一致和校准开销需要结合全文及目标硬件复核。"
+          ] },
+          { type: "heading", text: "可复现价值" },
+          { type: "text", text: "可先把1024阵元缩成8或16阵元圆阵，以纯PS、逐阵元TTD和每4阵元共享TTD三种架构比较带内最差指向误差、模态串扰与输出SINR。关键不是复刻其硬件规模，而是复刻“中心频点对齐—带内扫描—调制或链路指标”的证据顺序。" },
+          { type: "sources", items: [
+            { label: "论文原文页与DOI：Jiang et al., Science China Information Sciences 69, 150301（2026）", url: "https://doi.org/10.1007/s11432-025-4884-2" },
+            { label: "大学研究记录：True Time Delay in Phased Arrays（同行评审综述）", url: "https://cris.tau.ac.il/en/publications/true-time-delay-in-phased-arrays/" }
+          ] }
+        ],
+        tags: ["混合TTD-PS", "实测证据", "64QAM", "可缩放复现"]
+      },
+      {
+        label: "术语与思考题",
+        title: "把宽带阵列的时间、相位与链路指标对齐",
+        layout: "wide",
+        blocks: [
+          { type: "list", items: [
+            "True Time Delay, TTD（真时延）：对信号施加近似与频率无关的时间延迟；本期用于让几何补偿相位随频率线性变化。",
+            "Phase Shifter, PS（相移器）：对射频信号施加设定相位；本期的固定PS仅在设计频率精确对齐。",
+            "Beam squint（波束斜视）：主瓣方向随频率变化；本期是宽带模态和抗干扰失配的起点。",
+            "Error Vector Magnitude, EVM（误差矢量幅度）：实测调制符号与理想符号之间的归一化误差；本期用于连接阵列斜视与通信质量。",
+            "Orthogonal Frequency Division Multiplexing, OFDM（正交频分复用）：把宽带信号拆成多个窄带正交子载波；本期允许数字接收机逐子载波设置权值。",
+            "Channel State Information, CSI（信道状态信息）：描述信道复增益、方向或矩阵的估计信息；本期决定逐频权值能否正确匹配真实传播。",
+            "Group delay（群时延）：相位对角频率的负导数，单位s；本期用于判断硬件是否真正提供平坦时延，而不是只在若干频点相位接近。",
+            "Mode crosstalk（模态串扰）：能量从目标角向模态泄漏到其他模态；本期用XTℓ(f)评价整个频带而非单一频点。"
+          ] },
+          { type: "heading", text: "思考题" },
+          { type: "text", text: "一个8阵元UCA在f₀处用固定PS产生ℓ＝1并指向θ₀＝30°。系统相对带宽为20%，接收端用固定DFT投影。请分别讨论纯PS、逐阵元TTD和每4阵元共享TTD时，带边的主瓣角、模态串扰与输出SINR可能怎样排序；再说明为什么“TTD消除了方向斜视”仍不足以证明η₁(f)在全带宽保持不变。" }
+        ],
+        tags: ["TTD", "Beam squint", "EVM", "研究生思考题"]
+      }
+    ]
+  },
+  {
     issue: 10,
     date: "2026-08-10",
     dateLabel: "2026年8月10日 · ISSUE 10",
